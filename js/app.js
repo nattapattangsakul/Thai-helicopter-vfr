@@ -82,6 +82,7 @@ const ILS = {
   VTSP: [{ rwy: "27", id: "IPKT", freq: "109.90", ch: "CH36X" }],
   VTSB: [{ rwy: "22", id: "ISTN", freq: "109.50", ch: "CH32X" }],
   VTSS: [{ rwy: "26", id: "IHTY", freq: "109.90" }],
+  VTSC: [{ rwy: "02", id: "INTW", freq: "110.10", ch: "CH38X", note: "GP/DME 334.4" }],
   VTSG: [{ rwy: "32", id: "IKBI", freq: null }],
   VTUD: [{ rwy: "30", id: "IUDN", freq: "110.10" }],
   VTUU: [{ rwy: "23", id: "IUBL", freq: null }],

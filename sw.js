@@ -1,5 +1,5 @@
 /* THAI HELI-VFR EFB — service worker (generated from scripts/sw.template.js by `npm run build`) */
-const VERSION = "468b588db4";
+const VERSION = "5011153a21";
 const SHELL = `thv-shell-${VERSION}`;
 const TILES = "thv-tiles-v1";      // basemap tiles (also filled by "ดาวน์โหลดแผนที่ออฟไลน์")
 const DATA = "thv-data-v1";        // last good API responses (METAR, forecast, elevation...)
