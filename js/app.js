@@ -284,7 +284,16 @@ const AEROTHAI_NOTAMS = [
   ["J7190/26","VTCC","UAV/DRONE","caution","UAV เชียงใหม่ (ถึง 24 ธ.ค.) — รัศมี 0.3 NM (GND - 150 FT AGL)","UNMANNED AIRCRAFT WILL TAKE PLACE RADIUS 0.3NM CENTRE 184723.63N0985817.34E. DAILY 0300-0800 UTC.","2610240300 - 2612240800"],
   ["J7196/26","VTCC","UAV/DRONE","info","UAV เชียงใหม่ — รัศมี 1 NM (GND - 148 FT AGL)","UNMANNED AIRCRAFT WILL TAKE PLACE RADIUS 1NM CENTRE 185101.88N0985735.72E. DAILY 2300-1100 UTC.","2610312300 - 2611041100"],
   ["J7260/26","VTSY","UAV/DRONE","caution","UAV เบตง ยะลา — รัศมี 1.10 NM (GND - 660 FT AGL)","UNMANNED AIRCRAFT WILL TAKE PLACE RADIUS 1.10NM CENTRE 054632.8N1011039.8E.","2610300410 - 2611060930"],
-  ["J7234/26","VTUL","OPS/EVENT","caution","บินตรวจสอบ PAPI เลย — รัศมี 10 NM (GND - 4,000 FT AMSL)","PAPI FLTCK WILL TAKE PLACE RADIUS 10NM CENTRE 172620.88N1014319.43E. RMK: DEP/ARR ACFT WILL BE DLA DURING THIS PERIOD.","2611020600 - 2611030830"]
+  ["J7234/26","VTUL","OPS/EVENT","caution","บินตรวจสอบ PAPI เลย — รัศมี 10 NM (GND - 4,000 FT AMSL)","PAPI FLTCK WILL TAKE PLACE RADIUS 10NM CENTRE 172620.88N1014319.43E. RMK: DEP/ARR ACFT WILL BE DLA DURING THIS PERIOD.","2611020600 - 2611030830"],
+  // added from AEROTHAI NOTAM LIST SERIES J (still valid on 1 NOV 2026) via the in-app importer
+  ["J7209/26", "VTBB", "UAV/DRONE", "caution", "UAV Thoen District Lampang Province — พื้นที่กำหนด (GND - 700 FT AGL)", "UNMANNED AIRCRAFT WILL TAKE PLACE WI AREA 174101.58N0990918.69E-174051.78N0990929.54E-174036.54N0990916.28E-174051.87N0990902.74E- 174101.58N0990918.69E (THOEN DISTRICT LAMPANG PROVINCE) LOWER: GND / UPPER: 700FT AGL.", "2611020100 - 2611021100"],
+  ["J7215/26", "VTBB", "RESTRICTED", "critical", "พื้นที่ อันตราย VT D22 เปิดใช้งาน (GND - 6,000 FT AMSL)", "VT D22 ACT LOWER: GND / UPPER: 6000FT AMSL.", "2611030100 - 2611030900"],
+  ["J7220/26", "VTBB", "OPS/EVENT", "caution", "ร่มร่อน (Paragliding) Phetchabun And Loei Province — พื้นที่กำหนด (GND - 6,000 FT AGL)", "PARAGLIDING WILL TAKE PLACE WI ARER 170849.69N1010447.63E- 170305.45N1012740.32E-164015.97N1012355.62E- 164846.20N1010448.06E- 170849.69N1010447.63E (PHETCHABUN AND LOEI PROVINCE) DAILY 0300-0900. LOWER: GND / UPPER: 6000FT AGL.", "2612160300 - 2703150900"],
+  ["J7236/26", "VTBB", "UAV/DRONE", "caution", "UAV Thoen District Lampang Province — พื้นที่กำหนด (GND - 700 FT AGL)", "UNMANNED AIRCRAFT WILL TAKE PLACE WI AREA 174131.97N0990917.16E-174104.89N0990937.03E- 174038.53N0990947.74E-174021.86N0990921.28E- 174045.83N0990858.51E-174109.21N0990900.53E- 174131.97N0990917.16E (THOEN DISTRICT LAMPANG PROVINCE) DAILY 0100-1100. LOWER: GND / UPPER: 700FT AGL.", "2611030100 - 2611061100"],
+  ["J7247/26", "VTBB", "UAV/DRONE", "caution", "UAV Thoen District Lampang Province — พื้นที่กำหนด (GND - 700 FT AGL)", "UNMANNED AIRCRAFT WILL TAKE PLACE WI AREA 174112.04N0990920.58E- 174111.11N0990933.23E-174051.85N0990958.26E-174034.66N0990935.29E- 174023.77N0990915.63E-174049.11N0990900.00E-174052.56N0990900.94E- 174112.04N0990920.58E (THOEN DISTRICT LAMPANG PROVINCE) DAILY 0800-1100. LOWER: GND / UPPER: 700FT AGL.", "2611070800 - 2611101100"],
+  ["J7248/26", "VTBB", "UAV/DRONE", "caution", "UAV Thoen District Lampang Province — พื้นที่กำหนด (GND - 700 FT AGL)", "UNMANNED AIRCRAFT WILL TAKE PLACE WI AREA 174112.60N0990911.22E-174052.52N0990925.29E-174039.36N0990907.10E-174058.64N0990854.18E- 174112.60N0990911.22E (THOEN DISTRICT LAMPANG PROVINCE) LOWER: GND / UPPER: 700FT AGL.", "2611110100 - 2611111100"],
+  ["J7253/26", "VTBB", "UAV/DRONE", "caution", "UAV Lom Kao District Phetchabun Province — พื้นที่กำหนด (GND - 700 FT AGL)", "UNMANNED AIRCRAFT WILL TAKE PLACE WI AREA 170230.98N1012044.38E-170229.57N1012047.10E-170213.48N1012055.32E-170208.34N1012039.67E- 170209.35N1012035.12E-170226.01N1012027.14E-170230.98N1012044.38E (LOM KAO DISTRICT PHETCHABUN PROVINCE) DAILY 0100-1100. LOWER: GND / UPPER: 700FT AGL.", "2611160100 - 2611171100"],
+  ["J7258/26", "VTBB", "RESTRICTED", "critical", "พื้นที่ หวงห้าม VT R79 เปิดใช้งาน (GND - 6,000 FT AGL)", "VT R79 ACT LOWER: GND / UPPER: 6000FT AGL.", "2610302300 - 2611031100"]
 ].map(n => ({ id:n[0], series:"Series J", icao:n[1], category:n[2], severity:n[3], title:n[4], body:n[5], valid:n[6] }));
 
 // Helicopter presets — APPROXIMATE starting values only; operators must use their RFM / W&B report.
@@ -779,8 +788,8 @@ function flightCat(icao) {
     const imc = mt.vis < 5 || (mt.ceil != null && mt.ceil < 1500) || mt.vv || /(^|\s)[-+]?(FG|FZFG)\b/.test(wx);
     if (imc) return { label: "IMC", cls: "pill-stop", ok: false, imc: true, src: "METAR" };
     const below = mt.vis < vmin || (mt.ceil != null && mt.ceil < cmin);
-    const hazard = /(^|\s)[-+]?TS|SQ|FC|\+RA|\+SHRA/.test(wx) || mt.gust >= 25;
-    if (below || hazard) return { label: below ? "VMC • ต่ำกว่าขั้นต่ำที่ตั้ง" : "VMC • " + (mt.gust >= 25 ? `ลมกระโชก ${mt.gust}kt` : "TS/ฝนหนัก"), cls: "pill-warn", ok: true, marg: true, imc: false, src: "METAR" };
+    const hazard = /(^|\s)[-+]?TS|SQ|FC|\+RA|\+SHRA/.test(wx) || mt.gust >= 25 || mt.cb;
+    if (below || hazard) return { label: below ? "VMC • ต่ำกว่าขั้นต่ำที่ตั้ง" : "VMC • " + (mt.gust >= 25 ? `ลมกระโชก ${mt.gust}kt` : mt.cb && !/TS/.test(wx) ? "มี CB" : "TS/ฝนหนัก"), cls: "pill-warn", ok: true, marg: true, imc: false, src: "METAR" };
     return { label: "VMC", cls: "pill-go", ok: true, imc: false, src: "METAR" };
   }
   if (mt) return { label: "METAR เก่า", cls: "pill-info", ok: null, src: "STALE" };
@@ -1258,22 +1267,49 @@ function parseAwc(m) {
   return { raw: m.rawOb || "", obs: new Date(isFinite(t) ? t : Date.now()), wdir: typeof m.wdir === "number" ? m.wdir : null, wspd: m.wspd || 0, gust: m.wgst || 0, temp: m.temp, dew: m.dewp, qnh: Math.round(m.altim || 1013),
     vis: vism ? (+vism[1] >= 9999 ? 10 : +vism[1] / 1000) : v.includes("+") || !isFinite(vsm) ? 10 : Math.min(10, vsm * 1.609), ceil, vv: !!vvm, fltCat: m.fltCat || "", wx: m.wxString || "" };
 }
+// Raw ICAO METAR → same shape as parseAwc(). Used for metar.vatsim.net, a CORS-enabled mirror of
+// real-world METARs (aviationweather.gov sends no CORS header, so browsers cannot read it directly).
+function parseRawMetar(raw) {
+  const t = raw.replace(/^(METAR|SPECI)\s+/, "").replace(/\s+/g, " ").trim(), main = t.split(/\s(?:NOSIG|BECMG|TEMPO|RMK)\b/)[0];
+  const icao = t.slice(0, 4), tm = t.match(/\b(\d{2})(\d{2})(\d{2})Z\b/), now = new Date();
+  let obs = now;
+  if (tm) { obs = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), +tm[1], +tm[2], +tm[3])); if (obs - now > 36e5 * 24) obs = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, +tm[1], +tm[2], +tm[3])); }
+  const w = main.match(/\b(\d{3}|VRB)(\d{2,3})(?:G(\d{2,3}))?(KT|MPS)\b/), k = w && w[4] === "MPS" ? 1.944 : 1;
+  let vis = 10; const vm = main.match(/Z\s.*?\b(\d{4})(?:NDV|[NSEW]{1,2})?\b(?!\/)/);
+  if (/\bCAVOK\b/.test(main)) vis = 10; else if (vm) vis = +vm[1] >= 9999 ? 10 : +vm[1] / 1000;
+  const clouds = [...main.matchAll(/\b(FEW|SCT|BKN|OVC)(\d{3})(CB|TCU)?\b/g)].map(c => ({ cover: c[1], base: +c[2] * 100, cb: c[3] || "" }));
+  const vv = main.match(/\bVV(\d{3}|\/\/\/)\b/);
+  let ceil = clouds.filter(c => c.cover === "BKN" || c.cover === "OVC").map(c => c.base).sort((a, b) => a - b)[0] ?? null;
+  if (vv) ceil = vv[1] === "///" ? 0 : Math.min(ceil ?? 1e9, +vv[1] * 100);
+  const wx = [...main.matchAll(/(?:^|\s)((?:[-+]|VC)?(?:MI|PR|BC|DR|BL|SH|TS|FZ)?(?:DZ|RA|SN|SG|IC|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PO|SQ|FC|SS|DS)+|(?:VC)?TS)(?=\s|$)/g)].map(m => m[1]).join(" ");
+  const tdm = main.match(/\b(M?\d{2})\/(M?\d{2})?\b/), q = main.match(/\bQ(\d{4})\b/), a2 = main.match(/\bA(\d{4})\b/);
+  const tnum = s => s == null ? null : s.startsWith("M") ? -+s.slice(1) : +s;
+  return { icao, raw: "METAR " + t, obs, wdir: w && w[1] !== "VRB" ? +w[1] : null, wspd: w ? Math.round(+w[2] * k) : 0, gust: w && w[3] ? Math.round(+w[3] * k) : 0,
+    temp: tdm ? tnum(tdm[1]) : null, dew: tdm ? tnum(tdm[2]) : null, qnh: q ? +q[1] : a2 ? Math.round(+a2[1] / 100 * 33.8639) : 1013, vis, ceil, vv: !!vv, fltCat: "", wx, clouds, cb: clouds.some(c => c.cb) };
+}
 async function loadMetar() {
   if (metarBusy) return; metarBusy = true;
   const ids = AIRPORTS.map(a => a.icao).join(",");
-  try {
-    const r = await fetch(`https://aviationweather.gov/api/data/metar?ids=${ids}&format=json&hours=3&_=${Date.now()}`, { cache: "no-store" });
-    if (r.headers.get("X-THV-Offline")) throw new Error("offline");
+  let best = null, src = "";
+  try {   // 1) VATSIM mirror — CORS enabled
+    const r = await fetch(`https://metar.vatsim.net/metar.php?id=${ids}&_=${Date.now()}`, { cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
-    const d = await r.json(), best = {};
-    (Array.isArray(d) ? d : []).forEach(m => { const p = parseAwc(m); if (!best[m.icaoId] || p.obs > best[m.icaoId].obs) best[m.icaoId] = p; });
-    state.metar = best; state.metarAt = Date.now(); const n = Object.keys(best).length;
-    $("metar-status").textContent = `${n} สถานี • อัปเดต ${ict(new Date())} ICT`; setSrc("METAR", `${n} สถานี`, true);
-  } catch (e) { $("metar-status").textContent = "เชื่อมต่อไม่ได้ — ใช้ค่าโมเดลแทน"; setSrc("METAR", "เชื่อมต่อไม่ได้", false); }
-  try {
-    const r = await fetch(`https://aviationweather.gov/api/data/taf?ids=${ids}&format=json&_=${Date.now()}`, { cache: "no-store" });
-    if (r.ok) { const d = await r.json(); state.taf = {}; (Array.isArray(d) ? d : []).forEach(t => { if (!state.taf[t.icaoId] && t.rawTAF) state.taf[t.icaoId] = t.rawTAF; }); }
+    const off = r.headers.get("X-THV-Offline"), txt = await r.text(), b = {};
+    txt.split("\n").map(l => l.trim()).filter(l => /^[A-Z]{4}\s\d{6}Z/.test(l)).forEach(l => { const p = parseRawMetar(l); if (!b[p.icao] || p.obs > b[p.icao].obs) b[p.icao] = p; });
+    if (Object.keys(b).length) { best = b; src = off ? "VATSIM (ออฟไลน์-แคช)" : "VATSIM/NOAA"; }
   } catch (_) {}
+  if (!best) try {   // 2) AviationWeather.gov — works only if it ever sends CORS headers
+    const r = await fetch(`https://aviationweather.gov/api/data/metar?ids=${ids}&format=json&hours=3&_=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json(), b = {};
+    (Array.isArray(d) ? d : []).forEach(m => { const p = parseAwc(m); if (!b[m.icaoId] || p.obs > b[m.icaoId].obs) b[m.icaoId] = p; });
+    if (Object.keys(b).length) { best = b; src = "AviationWeather"; }
+  } catch (_) {}
+  if (best) {
+    state.metar = best; state.metarAt = Date.now();
+    const n = Object.keys(best).length, cur = Object.values(best).filter(m => (Date.now() - m.obs) / 6e4 <= METAR_MAX_AGE).length;
+    $("metar-status").textContent = `${cur}/${n} สถานีเป็นปัจจุบัน • ${src} • ${ict(new Date())} ICT`; setSrc("METAR", `${cur} สถานี`, true);
+  } else { $("metar-status").textContent = "เชื่อมต่อไม่ได้ — ใช้ค่าโมเดลแทน"; setSrc("METAR", "เชื่อมต่อไม่ได้", false); }
   metarBusy = false;
   renderMetarLayer(); renderMapMarkers(); renderWxCards(); renderAirportsList(); renderBrief();
 }
@@ -1716,29 +1752,34 @@ document.addEventListener("visibilitychange", () => { if (state.fly.on && docume
 // =========================================================================
 // 18. NOTAM IMPORT — AEROTHAI Series J list (PDF or pasted text)
 // =========================================================================
+const NOTAM_EVENT_TH = [[/PARAGLID/, "ร่มร่อน (Paragliding)"], [/FIREWORK/, "จุดดอกไม้ไฟ"], [/SKY LANTERN|KHOM LOY/, "ปล่อยโคมลอย"], [/AERIAL PHOTO|AERIAL SURVEY/, "ถ่ายภาพ/สำรวจทางอากาศ"], [/PAPI FLTCK|FLT ?CK|FLIGHT CHECK/, "บินตรวจสอบเครื่องช่วยเดินอากาศ"], [/MIL AIR EXER|AIR EXER/, "ฝึกทางอากาศทางทหาร"], [/BALLOON/, "บอลลูน"], [/AIR ?SHOW|AEROBATIC/, "แสดงการบิน"], [/LASER/, "แสงเลเซอร์"]];
 const NOTAM_CAT_TH = { "UAV/DRONE": "UAV", PJE: "กระโดดร่ม (PJE)", RESTRICTED: "พื้นที่หวงห้ามชั่วคราว", "MIL/FIRING": "ฝึก/ยิงอาวุธ", "OPS/EVENT": "" };
 let notamImportBuf = null;
 const NOTAM_ID_RE = /\b([A-Z]\d{4}\/\d{2})\b/g;
 const altFt = s => { if (!s) return null; const t = s.toUpperCase(); let m = t.match(/FL\s*(\d{2,3})/); if (m) return +m[1] * 100; m = t.match(/(\d[\d,]*)\s*(?:FT|FEET)/); if (m) return +m[1].replace(/,/g, ""); if (/\b(GND|SFC)\b/.test(t)) return 0; if (/UNL/.test(t)) return 99999; return null; };
-const fmtAlt = s => { if (!s) return ""; const t = s.toUpperCase().replace(/\s+/g, " ").trim(); const m = t.match(/^(\d[\d,]*)\s*(?:FT|FEET)\s*(AMSL|AGL|MSL)?/); return m ? `${fmt(+m[1].replace(/,/g, ""))} FT${m[2] ? " " + (m[2] === "MSL" ? "AMSL" : m[2]) : ""}` : t.replace(/^SFC$/, "GND"); };
+const fmtAlt = s => { if (!s) return ""; const t = s.toUpperCase().replace(/\s+/g, " ").trim(); const m = t.match(/^(\d[\d,.]*)\s*(?:FT|FEET)\s*(AMSL|AGL|MSL)?/); return m ? `${fmt(+m[1].replace(/,/g, ""))} FT${m[2] ? " " + (m[2] === "MSL" ? "AMSL" : m[2]) : ""}` : t.replace(/^SFC$/, "GND"); };
 function notamCategory(q, text) {
   const s = (q || "").slice(1, 3), t = text.toUpperCase();
   if (/UAV|UNMANNED|DRONE|RPAS/.test(t) || s === "WU") return "UAV/DRONE";
   if (/\bPJE\b|PARACHUT/.test(t) || s === "WP") return "PJE";
-  if (/FIRING|\bGUN|MISSILE|ROCKET|EXPLOSI|BOMB|MIL(ITARY)? EXER|LIVE FIRE/.test(t) || s === "WM") return "MIL/FIRING";
-  if (/RESTRICTED|PROHIBITED|DANGER AREA/.test(t) || /^R[TRPD]$/.test(s)) return "RESTRICTED";
+  if (/FIRING|FRNG|\bGUN|MISSILE|ROCKET|EXPLOSI|BOMB|MIL(ITARY)?( AIR)? EXER|LIVE FIRE/.test(t) || s === "WM") return "MIL/FIRING";
+  if (/RESTRICTED|PROHIBITED|DANGER AREA|\bVT ?[RPD] ?\d+\b/.test(t) || /^R[TRPD]$/.test(s)) return "RESTRICTED";
   return "OPS/EVENT";
 }
 function parseNotamText(raw) {
   const text = String(raw || "").replace(/\r/g, "").split("\n")
     .map(l => l.replace(/Page \d+ of \d+/i, "").replace(/THAILAND INTERNATIONAL NOTAM OFFICE/i, ""))
-    .filter(l => !/NOTAM LIST|(still|were still) valid on/i.test(l))
+    .filter(l => !/NOTAM LIST|(still|were still) valid on|REFERENCE NO\.|TELEPHONE\s*:|^\s*AFS\s*:|FACSIMILE|E\s*-?\s*MAIL\s*:|WWW\.AEROTHAI|AEROTHAI\s*:|SUPERSEDED BY AIP|AERONAUTICAL (INFORMATION|RADIO)|NGAMDU|BANGKOK 10120|INTERNATIONAL NOTAM OFFICE|^\s*(THAILAND|SERIES [A-Z]|\d{2}\/\d{2}|\d{1,2} [A-Z]{3} \d{4})\s*$/i.test(l))
     .join("\n").replace(/[ \t ]+/g, " ");
+  // AEROTHAI lists group NOTAMs under location headers such as "VTBD (BANGKOK/DON MUEANG INTL AIRPORT)"
+  const heads = [...text.matchAll(/(?:^|\n)\s*(VT[A-Z]{2}) \((?:[^()\n]|\([^()\n]*\))*\)\s*(?=\n|$)/g)].map(h => ({ at: h.index, end: h.index + h[0].length, icao: h[1] }));
   const starts = []; let m; NOTAM_ID_RE.lastIndex = 0;
   while ((m = NOTAM_ID_RE.exec(text))) { if (/NOTAM[RC]\s*$/.test(text.slice(Math.max(0, m.index - 10), m.index))) continue; starts.push(m.index); }
   const out = [], cancelled = new Set(), seen = new Set();
   starts.forEach((st, i) => {
-    const seg = text.slice(st, starts[i + 1] ?? text.length).trim(), id = seg.match(/^[A-Z]\d{4}\/\d{2}/)[0], flat = seg.replace(/\s*\n\s*/g, " ");
+    const nextHead = heads.find(h => h.at > st), stop = Math.min(starts[i + 1] ?? text.length, nextHead ? nextHead.at : text.length);
+    const seg = text.slice(st, stop).trim(), id = seg.match(/^[A-Z]\d{4}\/\d{2}/)[0], flat = seg.replace(/\s*\n\s*/g, " ");
+    const secIcao = (heads.filter(h => h.end <= st).pop() || {}).icao;
     if (seen.has(id)) return; seen.add(id);
     const c = flat.match(/NOTAMC\s+([A-Z]\d{4}\/\d{2})/); if (c) { cancelled.add(c[1]); return; }
     const q = flat.match(/Q\)\s*([A-Z]{4})\/(Q[A-Z]{4})\/[^/]*\/[^/]*\/[^/]*\/(\d{3})\/(\d{3})\/(\d{2})(\d{2})([NS])(\d{3})(\d{2})([EW])(\d{3})/);
@@ -1747,21 +1788,27 @@ function parseNotamText(raw) {
     if (!from) { const v = flat.match(/(\d{10})\s*(?:\/|-|–|TO)\s*(\d{10}|PERM)/); if (v) { from = v[1]; to = v[2]; } }
     const field = k => { const r = flat.match(new RegExp(`\\b${k}\\)\\s*(.*?)(?=\\s[A-G]\\)\\s|$)`)); return r ? r[1].trim() : ""; };
     let e = field("E"); const d = field("D"), f = field("F"), g = field("G");
-    if (!e) e = flat.replace(/^[A-Z]\d{4}\/\d{2}\s*(NOTAM[NR]\s*([A-Z]\d{4}\/\d{2})?)?/, "").replace(/(\d{10})\s*(?:\/|-|–|TO)\s*(\d{10}|PERM)(\s*EST)?/, "").replace(/\bVT[A-Z]{2}\b\s*/, "").trim();
+    const ll = flat.match(/LOWER LIMIT\s*:\s*(.+?)\s+UPPER LIMIT\s*:\s*(.+?)\s*$/);
+    let sched = "";
+    if (!e) e = flat.replace(/LOWER LIMIT\s*:.*$/, "").replace(/^[A-Z]\d{4}\/\d{2}\s*(NOTAM[NR]\s*([A-Z]\d{4}\/\d{2})?)?/, "").replace(/(\d{10})\s*(?:\/|-|–|TO)\s*(\d{10}|PERM)(\s*EST)?/, "").replace(/^\s*VT[A-Z]{2}\s+(?=\d{10})/, "").trim();
+    if (!b) { const first = seg.split("\n")[0], fv = first.match(/\d{10}\s*(?:\/|-|–|TO)\s*(?:\d{10}|PERM)(?:\s*EST)?\s*(.*)$/); if (fv && fv[1].trim() && !/LOWER LIMIT/.test(fv[1])) { sched = fv[1].trim(); const k = e.indexOf(sched); if (k >= 0) e = (e.slice(0, k) + e.slice(k + sched.length)).trim(); } }
+    if (!b && !sched) { const sm = e.match(/^((?:DAILY|MON|TUE|WED|THU|FRI|SAT|SUN|H24|SR-SS)[A-Z0-9 ,-]*?(?:\d{4}-\d{4}|SS))(?:\s+)(?=[A-Z]{2,}[A-Z ]*[A-Z](?:\s|$))/); if (sm && !d) { sched = sm[1].trim(); e = e.slice(sm[0].length).trim(); } }
     if (!e && !q) return;
-    const icao = (a && a[1]) || (flat.match(/\b(VT[A-Z]{2})\b/) || [])[1] || (q && q[1]) || "VTBB";
+    const icao = (a && a[1]) || secIcao || (flat.match(/\b(VT[A-Z]{2})\b/) || [])[1] || (q && q[1]) || "VTBB";
     const category = notamCategory(q && q[2], e);
     const rm = e.match(/RADIUS\s+(\d+(?:\.\d+)?)\s*NM/i), radius = rm ? +rm[1] : q ? +q[11] : null;
-    const lim2 = !f && !g ? e.match(/\b(GND|SFC|\d[\d,]*\s*FT(?:\s*(?:AMSL|AGL|MSL))?)\s*(?:-|–|TO)\s*(\d[\d,]*\s*FT(?:\s*(?:AMSL|AGL|MSL))?|FL\s*\d{2,3}|UNL)/) : null;
+    const tok = v => (String(v).toUpperCase().match(/GND|SFC|UNL|FL\s?\d{2,3}|\d[\d,.]*\s?FT(?:\s?(?:AMSL|AGL|MSL))?/) || [String(v).trim()])[0];
+    const lim2 = ll ? [null, tok(ll[1]), tok(ll[2])] : !f && !g ? e.match(/\b(GND|SFC|\d[\d,]*\s*FT(?:\s*(?:AMSL|AGL|MSL))?)\s*(?:-|–|TO)\s*(\d[\d,]*\s*FT(?:\s*(?:AMSL|AGL|MSL))?|FL\s*\d{2,3}|UNL)/) : null;
     const lower = f || (lim2 && lim2[1]) || (q ? (+q[3] ? `FL${q[3]}` : "GND") : ""), upper = g || (lim2 && lim2[2]) || (q && +q[4] && +q[4] < 999 ? `FL${q[4]}` : "");
     const up = altFt(upper);
-    const severity = category === "RESTRICTED" || category === "MIL/FIRING" || category === "PJE" ? "critical" : category === "UAV/DRONE" ? (up == null || up > 1000 ? "critical" : up > 200 ? "caution" : "info") : "caution";
+    const severity = /PARAGLID|FIREWORK|SKY LANTERN|KHOM LOY/.test(e) && category === "OPS/EVENT" ? "caution" : category === "RESTRICTED" || category === "MIL/FIRING" || category === "PJE" ? "critical" : category === "UAV/DRONE" ? (up == null || up > 1000 ? "critical" : up > 200 ? "caution" : "info") : "caution";
     const place = (e.match(/\(([A-Z][A-Z .'-]{3,60}(?:PROVINCE|DISTRICT|AREA))\)/) || [])[1];
-    const what = NOTAM_CAT_TH[category] || e.split(/\s+/).slice(0, 5).join(" ");
+    const area = e.match(/\bVT ?([RPD]) ?(\d+)\b/);
+    const what = area ? `พื้นที่ ${{ R: "หวงห้าม", P: "ห้ามบิน", D: "อันตราย" }[area[1]]} VT ${area[1]}${area[2]} เปิดใช้งาน` : NOTAM_CAT_TH[category] || (NOTAM_EVENT_TH.find(([re]) => re.test(e)) || [])[1] || (e.match(/^(.{3,40}?)\s+WILL\b/) || [])[1] || e.split(/\s+/).slice(0, 4).join(" ");
     const lim = lower || upper ? ` (${fmtAlt(lower) || "GND"} - ${fmtAlt(upper) || "?"})` : "";
     const isPoly = parseNotamCoords(e).length >= 3;
-    const title = `${what} ${place ? place.toLowerCase().replace(/\b\w/g, x => x.toUpperCase()) : icao}${isPoly ? " — พื้นที่กำหนด" : radius ? ` — รัศมี ${radius} NM` : ""}${lim}`;
-    const body = `${e.toUpperCase()}${d ? ` SCHEDULE: ${d}.` : ""}${lower || upper ? ` LOWER: ${lower || "-"} / UPPER: ${upper || "-"}.` : ""}`;
+    const title = area ? `${what}${lim}` : `${what} ${place ? place.toLowerCase().replace(/\b\w/g, x => x.toUpperCase()) : icao}${isPoly ? " — พื้นที่กำหนด" : radius ? ` — รัศมี ${radius} NM` : ""}${lim}`;
+    const body = `${e.toUpperCase()}${d || sched ? ` ${d || sched}.` : ""}${lower || upper ? ` LOWER: ${lower || "-"} / UPPER: ${upper || "-"}.` : ""}`;
     const n = { id, series: `Series ${id[0]}`, icao, category, severity, title, body, valid: from ? `${from} - ${to || "PERM"}` : "PERM", imported: true };
     if (q) { let la = +q[5] + q[6] / 60, lo = +q[8] + q[9] / 60; if (q[7] === "S") la = -la; if (q[10] === "W") lo = -lo; n.geo = { lat: la, lon: lo, r: +q[11] || 1 }; }
     out.push(n);

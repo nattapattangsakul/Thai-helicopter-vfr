@@ -9,7 +9,7 @@ const MAX_OPAQUE = 600;           // no-CORS tiles (Google) are counted heavily 
 const PRECACHE = __PRECACHE__;
 
 const TILE_HOSTS = /(^|\.)(mt\d\.google\.com|server\.arcgisonline\.com|basemaps\.cartocdn\.com|tile\.opentopomap\.org|tile\.openstreetmap\.org|gibs\.earthdata\.nasa\.gov|api\.tiles\.openaip\.net)$/;
-const DATA_HOSTS = /(^|\.)(api\.open-meteo\.com|aviationweather\.gov|api\.rainviewer\.com)$/;
+const DATA_HOSTS = /(^|\.)(api\.open-meteo\.com|aviationweather\.gov|metar\.vatsim\.net|api\.rainviewer\.com)$/;
 const NO_CACHE_HOSTS = /(^|\.)(tilecache\.rainviewer\.com)$/;
 
 self.addEventListener("install", e => {
