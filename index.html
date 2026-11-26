@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="th" data-build="59fed15ed8">
+<html lang="th" data-build="468b588db4">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
 <title>THAI HELI-VFR EFB</title>
-<meta name="description" content="Electronic Flight Bag สำหรับวางแผนและบิน VFR เฮลิคอปเตอร์ในประเทศไทย — Navlog แก้ลม, น้ำมัน/น้ำหนัก, NOTAM, METAR/TAF, เรดาร์ฝน, สิ่งกีดขวาง, ADS-B และโหมดบิน GPS" />
+<meta name="description" content="Electronic Flight Bag สำหรับวางแผนและบิน VFR เฮลิคอปเตอร์ในประเทศไทย — Navlog แก้ลม, น้ำมัน/น้ำหนัก, NOTAM, METAR/TAF, เรดาร์ฝน, สิ่งกีดขวาง และโหมดบิน GPS" />
 <meta name="application-name" content="THAI HELI-VFR" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -83,7 +83,7 @@
       <div id="bm-gallery" class="grid grid-cols-4 gap-2 px-1"></div>
 
       <div class="sec-t pt-3">การบิน (ชุดข้อมูลในแอป)</div>
-      <label class="sw"><input type="checkbox" id="tg-airports" checked/><span class="tr" style="--c:#22c55e"></span><span class="tx">สนามบิน<small>CAAT eAIP / AEROTHAI</small></span></label>
+      <label class="sw"><input type="checkbox" id="tg-airports" checked/><span class="tr" style="--c:#22c55e"></span><span class="tx">สนามบิน<small>สีตาม METAR: เขียว VMC • แดง IMC • เทา ไม่มี METAR ปัจจุบัน</small></span></label>
       <label class="sw"><input type="checkbox" id="tg-navaids" checked/><span class="tr" style="--c:#38bdf8"></span><span class="tx">VOR/DME</span></label>
       <label class="sw"><input type="checkbox" id="tg-rings"/><span class="tr" style="--c:#38bdf8"></span><span class="tx">วง 25 NM รอบ VOR</span></label>
       <label class="sw"><input type="checkbox" id="tg-vfr" checked/><span class="tr" style="--c:#f97316"></span><span class="tx">VFR Reporting Points</span></label>
@@ -104,9 +104,6 @@
       <label class="sw"><input type="checkbox" id="tg-osm-power"/><span class="tr" style="--c:#f43f5e"></span><span class="tx">สายไฟฟ้าแรงสูง<small>แสดงเมื่อซูม ≥ 11</small></span></label>
       <label class="sw"><input type="checkbox" id="tg-osm-obst"/><span class="tr" style="--c:#fb923c"></span><span class="tx">เสา/หอสูง/ปล่องควัน/กังหันลม<small>แสดงเมื่อซูม ≥ 10</small></span></label>
 
-      <div class="sec-t pt-3">จราจรทางอากาศ (สด)</div>
-      <label class="sw"><input type="checkbox" id="tg-traffic"/><span class="tr" style="--c:#fbbf24"></span><span class="tx">ADS-B Traffic<small>airplanes.live → adsb.lol → OpenSky • อัปเดตทุก 15 วิ</small></span></label>
-
       <div class="sec-t pt-3">ห้วงอากาศ</div>
       <label class="sw"><input type="checkbox" id="tg-openaip"/><span class="tr" style="--c:#a78bfa"></span><span class="tx">openAIP (CTR/TMA/R/P/D, สิ่งกีดขวาง)<small>ต้องใช้ API key ฟรีจาก openaip.net</small></span></label>
       <div class="pl-[52px] pr-1 -mt-1 flex gap-1.5"><input id="oaip-key" class="inp !py-1 !text-[12px]" placeholder="openAIP API key" autocomplete="off"/></div>
@@ -116,7 +113,7 @@
 
       <div class="sec-t pt-3">สถานะแหล่งข้อมูล</div>
       <div id="src-status" class="flex flex-wrap gap-1 px-1"></div>
-      <p class="text-[10.5px] text-slate-500 px-1 pt-1 leading-relaxed">ข้อมูลภายนอกใช้ประกอบการวางแผนเท่านั้น — OSM ไม่ครบทุกเสา/สายไฟ, ADS-B ไม่เห็นอากาศยานที่ไม่มี transponder ตรวจสอบกับ AIP/NOTAM/MET อย่างเป็นทางการเสมอ</p>
+      <p class="text-[10.5px] text-slate-500 px-1 pt-1 leading-relaxed">ข้อมูลภายนอกใช้ประกอบการวางแผนเท่านั้น — OSM ไม่ครบทุกเสา/สายไฟ, ตรวจสอบกับ AIP/NOTAM/MET อย่างเป็นทางการเสมอ</p>
     </div>
   </div>
 
@@ -405,6 +402,7 @@
           <input id="nn-valid" class="inp !text-[14px]" placeholder="VALID YYMMDDhhmm - YYMMDDhhmm (UTC)"/>
           <div class="flex justify-end gap-1.5"><button type="button" id="btn-cancel-notam" class="btn btn-sm">ยกเลิก</button><button class="btn btn-sm btn-amber">บันทึก</button></div>
         </form>
+        <p id="notam-expired-note" class="text-[11px] text-slate-500 px-1"></p>
         <div id="notams-list" class="space-y-2"></div>
       </section>
 
@@ -503,7 +501,6 @@
     <div class="tile"><div class="k">MSA ขานี้</div><div class="v" id="t-msa">--</div><div class="s">ft MSL</div></div>
     <div class="tile !border-sky-500/50"><div class="k">น้ำมันคงเหลือ (ประมาณ)</div><div class="v" id="t-fuel">--</div><div class="s" id="t-fuel-s">lbs</div></div>
     <div class="tile"><div class="k">ปลายทาง <span id="t-destname" class="mono text-slate-300"></span></div><div class="v" id="t-ddist">--</div><div class="s" id="t-deta">ETA --</div></div>
-    <div class="tile" id="t-tfc-tile"><div class="k">จราจรใกล้สุด (ADS-B)</div><div class="v" id="t-tfc">--</div><div class="s" id="t-tfc-s">เปิดชั้น "ADS-B Traffic"</div></div>
     <div class="tile"><div class="k">ความถี่ปลายทาง</div><div class="mono text-[14px] text-emerald-300 leading-relaxed" id="t-freq">--</div></div>
   </div>
   <p class="px-3 pb-2 text-[11px] text-slate-500">ใช้ประกอบการเดินอากาศ VFR เท่านั้น — ไม่ใช่อุปกรณ์นำร่องหลัก/ระบบหลีกเลี่ยงการชน • น้ำมันคงเหลือคำนวณจากเวลาบิน × อัตราสิ้นเปลือง ตรวจเกจจริงเสมอ</p>
@@ -568,7 +565,7 @@
 
       <div class="card">
         <div class="h2"><i data-lucide="info" class="text-slate-300"></i>เกี่ยวกับ</div>
-        <p class="text-[12px] text-slate-400 leading-relaxed">ใช้ประกอบการวางแผนและเดินอากาศ VFR เท่านั้น ไม่ใช่แหล่งข้อมูลการบินอย่างเป็นทางการ ตรวจสอบกับ AIP Thailand, NOTAM (AEROTHAI), ข้อมูลอุตุนิยมวิทยา (TMD) และ RFM ของเครื่องทุกครั้ง • แหล่งข้อมูล: CAAT eAIP, AEROTHAI, NOAA AviationWeather, Open-Meteo, RainViewer, NASA GIBS, OpenStreetMap, airplanes.live / adsb.lol / OpenSky, openAIP</p>
+        <p class="text-[12px] text-slate-400 leading-relaxed">ใช้ประกอบการวางแผนและเดินอากาศ VFR เท่านั้น ไม่ใช่แหล่งข้อมูลการบินอย่างเป็นทางการ ตรวจสอบกับ AIP Thailand, NOTAM (AEROTHAI), ข้อมูลอุตุนิยมวิทยา (TMD) และ RFM ของเครื่องทุกครั้ง • แหล่งข้อมูล: CAAT eAIP, AEROTHAI, NOAA AviationWeather, Open-Meteo, RainViewer, NASA GIBS, OpenStreetMap, openAIP</p>
         <div class="flex flex-wrap gap-1.5">
           <button id="btn-check-update" class="btn btn-sm"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>ตรวจหาอัปเดต</button>
           <button id="btn-shortcuts" class="btn btn-sm"><i data-lucide="keyboard" class="w-3.5 h-3.5"></i>คีย์ลัด</button>

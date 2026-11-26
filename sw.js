@@ -1,5 +1,5 @@
 /* THAI HELI-VFR EFB — service worker (generated from scripts/sw.template.js by `npm run build`) */
-const VERSION = "59fed15ed8";
+const VERSION = "468b588db4";
 const SHELL = `thv-shell-${VERSION}`;
 const TILES = "thv-tiles-v1";      // basemap tiles (also filled by "ดาวน์โหลดแผนที่ออฟไลน์")
 const DATA = "thv-data-v1";        // last good API responses (METAR, forecast, elevation...)
@@ -44,7 +44,7 @@ const PRECACHE = [
 
 const TILE_HOSTS = /(^|\.)(mt\d\.google\.com|server\.arcgisonline\.com|basemaps\.cartocdn\.com|tile\.opentopomap\.org|tile\.openstreetmap\.org|gibs\.earthdata\.nasa\.gov|api\.tiles\.openaip\.net)$/;
 const DATA_HOSTS = /(^|\.)(api\.open-meteo\.com|aviationweather\.gov|api\.rainviewer\.com)$/;
-const NO_CACHE_HOSTS = /(^|\.)(tilecache\.rainviewer\.com|api\.airplanes\.live|api\.adsb\.lol|opensky-network\.org)$/;
+const NO_CACHE_HOSTS = /(^|\.)(tilecache\.rainviewer\.com)$/;
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(SHELL).then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: "reload" })))));

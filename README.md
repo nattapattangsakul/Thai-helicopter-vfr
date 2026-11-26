@@ -6,8 +6,8 @@ Electronic Flight Bag สำหรับวางแผนและบิน VFR
 - **แผนบิน** — ค้นหา ICAO / VOR / VFR Reporting Point / พิกัด (DD, DDM, DMS), ลากจุดบนแผนที่, Navlog แก้ลม (TC/MH/GS/ETE/ETA/Fuel/MSA), โปรไฟล์ภูมิประเทศ
 - **น้ำมัน/น้ำหนัก** — Fuel plan ตาม ICAO Annex 6 Pt III, Weight vs MTOW, preset เฮลิคอปเตอร์
 - **บรีฟ Go/No-Go** — เชื้อเพลิง, น้ำหนัก, ภูมิประเทศ, อากาศ, NOTAM ตามเส้นทาง, แสงกลางวัน, สแกนสิ่งกีดขวาง OSM, Checklist
-- **ข้อมูลสด** — METAR/TAF (NOAA), ลมพยากรณ์ (Open-Meteo), เรดาร์ฝน (RainViewer), ภาพดาวเทียม (NASA GIBS), ADS-B, openAIP
-- **โหมดบิน** — GPS: ระยะ/BRG/ETE/GS/XTE/น้ำมันคงเหลือ, จราจรใกล้สุด, หรี่จอกลางคืน, กันจอดับ
+- **ข้อมูลสด** — METAR/TAF (NOAA), ลมพยากรณ์ (Open-Meteo), เรดาร์ฝน (RainViewer), ภาพดาวเทียม (NASA GIBS), openAIP
+- **โหมดบิน** — GPS: ระยะ/BRG/ETE/GS/XTE/น้ำมันคงเหลือ, หรี่จอกลางคืน, กันจอดับ
 - **แอป** — ติดตั้งได้, ทำงานออฟไลน์, ดาวน์โหลดแผนที่ตามเส้นทาง, สำรอง/กู้คืนข้อมูล, ส่งออก/นำเข้า GPX, แจ้งเวอร์ชันใหม่, shortcut บนไอคอนแอป
 
 ## ติดตั้งบนอุปกรณ์

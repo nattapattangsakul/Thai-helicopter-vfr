@@ -7,10 +7,10 @@ const AIRPORTS = [
   { icao: "VTBU", iata: "UTP", name: "U-Tapao Rayong-Pattaya Intl", nameTh: "ท่าอากาศยานอู่ตะเภา", lat: 12.6797, lon: 101.0050, elev: 59, type: "Intl Civil/Navy", runways: ["18/36 (11,499 ft)"], atc: { ATIS: "127.2", GND: "121.9", TWR: "118.3", APP: "119.7" }, heliNote: "หลีกเลี่ยงการบินเหนือโรงแยกก๊าซมาบตาพุด; VFR เฉพาะกลางวัน", navaids: [{ id: "UTP", type: "DVOR/DME", freq: "110.80", ch: "CH45X" }] },
   { icao: "VTCC", iata: "CNX", name: "Chiang Mai Intl", nameTh: "ท่าอากาศยานเชียงใหม่", lat: 18.7690, lon: 98.9679, elev: 1036, type: "Intl Civil/Mil", runways: ["18/36 (11,155 ft)"], atc: { ATIS: "127.2", GND: "121.9", TWR: "118.1", APP: "129.6" }, heliNote: "ภูมิประเทศภูเขาสูงโดยรอบ ใช้จุดรอ KARAE สำหรับบริการเรดาร์ TMA", navaids: [{ id: "CMA", type: "DVOR/DME", freq: "116.90", ch: "CH116X" }] },
   { icao: "VTCT", iata: "CEI", name: "Mae Fah Luang Chiang Rai Intl", nameTh: "ท่าอากาศยานแม่ฟ้าหลวง เชียงราย", lat: 19.9543, lon: 99.8791, elev: 1280, type: "Intl Civil", runways: ["03/21 (9,843 ft)"], atc: { ATIS: "127.85", TWR: "118.4", APP: "120.05" }, heliNote: "ระวังเสาสื่อสารสูง 230 ft บริเวณใกล้สนามบิน", navaids: [{ id: "CTR", type: "DVOR/DME", freq: "116.50", ch: "CH112X" }] },
-  { icao: "VTSP", iata: "HKT", name: "Phuket Intl", nameTh: "ท่าอากาศยานภูเก็ต", lat: 8.1053, lon: 98.3056, elev: 82, type: "Intl Civil", runways: ["09/27 (9,843 ft)"], atc: { ATIS: "128.0", CDC: "118.55", GND: "121.9", TWR: "118.1", ARR: "120.7", APP: "124.7" }, heliNote: "การจราจรหนาแน่น ประสานงานเส้นทาง VFR เลียบชายฝั่ง", navaids: [{ id: "PUT", type: "DVOR/DME", freq: "116.90", ch: "CH116X" }, { id: "IPKT", type: "ILS/LOC RWY 27", freq: "109.90", ch: "CH36X" }] },
+  { icao: "VTSP", iata: "HKT", name: "Phuket Intl", nameTh: "ท่าอากาศยานภูเก็ต", lat: 8.1053, lon: 98.3056, elev: 82, type: "Intl Civil", runways: ["09/27 (9,843 ft)"], atc: { ATIS: "128.0", CDC: "118.55", GND: "121.9", TWR: "118.1", ARR: "120.7", APP: "124.7" }, heliNote: "การจราจรหนาแน่น ประสานงานเส้นทาง VFR เลียบชายฝั่ง", navaids: [{ id: "PUT", type: "DVOR/DME", freq: "116.90", ch: "CH116X" }] },
   { icao: "VTSG", iata: "KBV", name: "Krabi Intl", nameTh: "ท่าอากาศยานกระบี่", lat: 8.0988, lon: 98.9828, elev: 82, type: "Intl Civil", runways: ["14/32"], atc: { ATIS: "132.4", GND: "121.9", TWR: "122.5", APP: "120.05" }, heliNote: "ระวังภูมิประเทศเขาหินปูนสูงชันรอบอ่าวพังงาและกระบี่", navaids: [] },
   { icao: "VTSM", iata: "USM", name: "Samui Intl", nameTh: "ท่าอากาศยานสมุย", lat: 9.5478, lon: 100.0622, elev: 65, type: "Intl Private", runways: ["17/35"], atc: { ATIS: "128.6", GND: "121.9", TWR: "118.9", APP: "129.6" }, heliNote: "เส้นทาง VFR เชื่อมต่อแผ่นดินใหญ่ผ่านจุด SMU VOR/DME", navaids: [{ id: "SMU", type: "DVOR/DME", freq: "117.60", ch: "CH123X" }, { id: "SM", type: "NDB", freq: "316 kHz", ch: "NDB" }] },
-  { icao: "VTSB", iata: "URT", name: "Surat Thani Intl", nameTh: "ท่าอากาศยานสุราษฎร์ธานี", lat: 9.1344, lon: 99.1425, elev: 20, type: "Intl Civil/Mil", runways: ["04/22"], atc: { ATIS: "125.95", GND: "121.9", TWR: "122.7", APP: "123.35" }, heliNote: "ฐานบินร่วม กองบิน 7 และพาณิชย์", navaids: [{ id: "STN", type: "DVOR/DME", freq: "110.60", ch: "CH43X" }, { id: "ISTN", type: "ILS/LOC RWY 22", freq: "109.50", ch: "CH32X" }] },
+  { icao: "VTSB", iata: "URT", name: "Surat Thani Intl", nameTh: "ท่าอากาศยานสุราษฎร์ธานี", lat: 9.1344, lon: 99.1425, elev: 20, type: "Intl Civil/Mil", runways: ["04/22"], atc: { ATIS: "125.95", GND: "121.9", TWR: "122.7", APP: "123.35" }, heliNote: "ฐานบินร่วม กองบิน 7 และพาณิชย์", navaids: [{ id: "STN", type: "DVOR/DME", freq: "110.60", ch: "CH43X" }] },
   { icao: "VTSS", iata: "HDY", name: "Hat Yai Intl", nameTh: "ท่าอากาศยานหาดใหญ่", lat: 6.9365, lon: 100.3937, elev: 90, type: "Intl Civil/Mil", runways: ["08/26"], atc: { ATIS: "128.8", GND: "121.9", TWR: "118.1", APP: "126.7" }, heliNote: "ตรวจสอบสถานะ TACAN HTY ก่อนใช้งาน", navaids: [{ id: "HTY", type: "VOR/DME", freq: "115.30", ch: "CH100X" }] },
   { icao: "VTUD", iata: "UTH", name: "Udon Thani Intl", nameTh: "ท่าอากาศยานอุดรธานี", lat: 17.3869, lon: 102.7757, elev: 579, type: "Intl Civil/Mil", runways: ["12/30"], atc: { ATIS: "127.6", GND: "121.9", TWR: "122.5", APP: "126.2" }, heliNote: "ฐานบินร่วมทหารอากาศ (กองบิน 23) และพาณิชย์", navaids: [] },
   { icao: "VTPH", iata: "HHQ", name: "Hua Hin Airport", nameTh: "ท่าอากาศยานหัวหิน", lat: 12.6282, lon: 99.9528, elev: 62, type: "Domestic / VFR", runways: ["16/34 (6,890 ft)"], atc: { ATIS: "126.8", GND: "121.9", TWR: "122.7", APP: "126.2" }, heliNote: "ติดต่อ Hua Hin APP ที่ระยะ ~35 NM; VFR Exit RWY 34 ผ่านเขาวัง", navaids: [{ id: "HHN", type: "DVOR/DME", freq: "113.30", ch: "CH80X" }] },
@@ -70,6 +70,31 @@ const AIRPORTS = [
 ];
 
 // [id, name, freq, ch, hours, lat, lon, elev, icao]
+// ILS / localizer data — compiled from CAAT eAIP AD 2.19 extracts and approach charts (various AIRAC cycles)
+// plus community references where noted. Frequencies MUST be verified against the current AIRAC before use.
+// freq null = ILS published but frequency not confirmed — check the AIP chart.
+const ILS = {
+  VTBS: [{ rwy: "01R", id: "ISES", freq: "110.10" }, { rwy: "19L", id: "ISEN", freq: "110.50", ch: "CH42X" }, { rwy: "01L", id: "ISWS", freq: "109.10" }],
+  VTBD: [{ rwy: "21R", id: "IBKK", freq: "109.30", cat: "CAT II" }, { rwy: "03L", id: "IBKD", freq: "109.70" }, { rwy: "21L", id: "IDMG", freq: "110.30" }],
+  VTBU: [{ rwy: "18", id: "IBUT", freq: "111.90", note: "AIP 2025 (ฉบับเก่า 111.10)" }],
+  VTCC: [{ rwy: "36", id: "ICMA", freq: "109.90" }],
+  VTCT: [{ rwy: "03", id: null, freq: null }],
+  VTSP: [{ rwy: "27", id: "IPKT", freq: "109.90", ch: "CH36X" }],
+  VTSB: [{ rwy: "22", id: "ISTN", freq: "109.50", ch: "CH32X" }],
+  VTSS: [{ rwy: "26", id: "IHTY", freq: "109.90" }],
+  VTSG: [{ rwy: "32", id: "IKBI", freq: null }],
+  VTUD: [{ rwy: "30", id: "IUDN", freq: "110.10" }],
+  VTUU: [{ rwy: "23", id: "IUBL", freq: null }],
+  VTPP: [{ rwy: "32", id: "IPSL", freq: null }]
+};
+AIRPORTS.forEach(a => { a.ils = ILS[a.icao] || []; });
+const ilsStr = l => `ILS ${l.rwy}${l.id ? " " + l.id : ""} ${l.freq || "(ดูความถี่ใน AIP)"}${l.cat ? " " + l.cat : ""}`;
+function navaidRows(ap, cls = "text-[12px]") {
+  const rows = ap.navaids.map(n => `<div class="flex justify-between gap-2 ${cls} mono"><span class="text-sky-300">${esc(n.id)} ${esc(n.type)}</span><span>${esc(n.freq)} ${esc(n.ch)}</span></div>`);
+  ap.ils.forEach(l => rows.push(`<div class="flex justify-between gap-2 ${cls} mono"><span class="text-fuchsia-300">ILS RWY ${esc(l.rwy)}${l.id ? " • " + esc(l.id) : ""}${l.cat ? " • " + l.cat : ""}</span><span class="${l.freq ? "" : "text-slate-500"}">${l.freq ? esc(l.freq) + " MHz" : "ดูใน AIP"}${l.ch ? " " + l.ch : ""}${l.note ? ` <span class="text-slate-500">${esc(l.note)}</span>` : ""}</span></div>`));
+  return rows.length ? `<div class="space-y-0.5">${rows.join("")}</div>${ap.ils.length ? `<div class="text-[10px] text-slate-500">ข้อมูล ILS ตรวจกับ AIP/AIRAC ปัจจุบันก่อนใช้</div>` : ""}` : "";
+}
+
 const VOR_STATIONS = [
   ["BKK","BANGKOK","117.7","CH124X","H24",13.893611,100.596111,100,"VTBD"],
   ["SVB","SUVARNABHUMI","111.4","CH51X","H24",13.659028,100.731444,5,"VTBS"],
@@ -319,7 +344,7 @@ const state = {
   cwps: LS.get(K.wps, []),
   customNotams: LS.get(K.notams, []),
   notams: [],
-  weather: {}, metar: {}, taf: {}, traffic: [],
+  weather: {}, metar: {}, taf: {},
   profile: null,
   legs: [], totals: {},
   addWpMode: false,
@@ -329,7 +354,9 @@ const state = {
   fly: Object.assign({ on:false, min:false, target:1, takeoff:null, landed:null }, LS.get(K.fly, {}))
 };
 if (!Array.isArray(state.route)) state.route = [];
-state.notams = [...state.customNotams, ...AEROTHAI_NOTAMS];
+state.notams = [];
+function notamExpired(n, now = new Date()) { const v = notamValidity(n); return !!(v && v.to < now); }
+function rebuildNotams() { const now = new Date(), all = [...state.customNotams, ...AEROTHAI_NOTAMS]; state.notams = all.filter(n => !notamExpired(n, now)); state.notamsExpired = all.length - state.notams.length; }
 
 function saveS() { LS.set(K.set, S); }
 function toast(msg) { const el = $("toast"); el.textContent = msg; el.classList.remove("hidden"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.add("hidden"), 2800); }
@@ -398,7 +425,9 @@ const BASEMAPS = {
   sat:    { n:"ดาวเทียม+ถนน", sw:"linear-gradient(135deg,#2f4a2b,#1e3a5f 60%,#e5c07b)", l:L.tileLayer("https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", { attribution: "Imagery © Google", maxZoom: 20 }) },
   gearth: { n:"ดาวเทียมล้วน", sw:"linear-gradient(135deg,#1f3b24,#3d5a3a 50%,#264d73)", l:L.tileLayer("https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", { attribution: "Imagery © Google", maxZoom: 20 }) },
   esri:   { n:"Esri Imagery", sw:"linear-gradient(135deg,#384d2d,#1d3557 70%)", l:L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Esri, Maxar, Earthstar", maxZoom: 19 }) },
-  dark:   { n:"กลางคืน", sw:"linear-gradient(135deg,#0b0f19,#1f2937 60%,#374151)", l:L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution: "© OpenStreetMap © CARTO", subdomains:"abcd", maxZoom: 20 }) },
+  dark:   { n:"กลางคืน", sw:"linear-gradient(135deg,#0b0f19,#1f2937 60%,#374151)", l:L.layerGroup([
+            L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", { attribution: "Esri, HERE, Garmin, © OpenStreetMap", maxZoom: 16 }),
+            L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16 })]) },
   topo:   { n:"Esri Topo", sw:"linear-gradient(135deg,#e8e2c8,#b9d3a0 50%,#9cc3e0)", l:L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", { attribution: "Esri", maxZoom: 18 }) },
   otm:    { n:"OpenTopo", sw:"linear-gradient(135deg,#f1e7c9,#c9b98a 40%,#8fb07a)", l:L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap, SRTM | © OpenTopoMap", subdomains:"abc", maxZoom: 17 }) },
   osm:    { n:"OSM ถนน", sw:"linear-gradient(135deg,#f2efe9,#e6d9b8 50%,#aad3df)", l:L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap contributors", maxZoom: 19 }) },
@@ -410,17 +439,16 @@ let activeBase = BASEMAPS[S.basemap].l.addTo(map);
 if (S.basemap === "relief") refLabels.addTo(map);
 function setBasemap(k) {
   if (!BASEMAPS[k]) return; map.removeLayer(activeBase); if (map.hasLayer(refLabels)) map.removeLayer(refLabels);
-  S.basemap = k; activeBase = BASEMAPS[k].l.addTo(map); activeBase.bringToBack(); if (k === "relief") refLabels.addTo(map); saveS(); renderBmGallery();
+  S.basemap = k; activeBase = BASEMAPS[k].l.addTo(map); (activeBase.getLayers ? activeBase.getLayers().slice().reverse() : [activeBase]).forEach(l => l.bringToBack()); if (k === "relief") refLabels.addTo(map); saveS(); renderBmGallery();
 }
 function renderBmGallery() { $("bm-gallery").innerHTML = Object.entries(BASEMAPS).map(([k, b]) => `<button data-bm="${k}" class="bm-btn ${S.basemap === k ? "active" : ""}"><i style="background:${b.sw}"></i>${b.n}</button>`).join(""); }
 map.createPane("terrainPane").style.zIndex = 350;
 map.createPane("osmPane").style.zIndex = 420;
 map.createPane("routePane").style.zIndex = 650;
-map.createPane("trafficPane").style.zIndex = 660;
 const osmCanvas = L.canvas({ pane: "osmPane", padding: .3 });
 const L_ap = L.layerGroup().addTo(map), L_nav = L.layerGroup().addTo(map), L_vfr = L.layerGroup().addTo(map), L_ring = L.layerGroup(),
   L_notam = L.layerGroup().addTo(map), L_terr = L.layerGroup().addTo(map), L_cwp = L.layerGroup().addTo(map), L_route = L.layerGroup().addTo(map), L_gps = L.layerGroup().addTo(map);
-const L_metar = L.layerGroup(), L_wind = L.layerGroup(), L_traffic = L.layerGroup(), L_osmHeli = L.layerGroup(), L_osmPower = L.layerGroup(), L_osmObst = L.layerGroup(), L_scan = L.layerGroup().addTo(map);
+const L_metar = L.layerGroup(), L_wind = L.layerGroup(), L_osmHeli = L.layerGroup(), L_osmPower = L.layerGroup(), L_osmObst = L.layerGroup(), L_scan = L.layerGroup().addTo(map);
 let radarLayer = null;
 
 function apPopup(ap) {
@@ -432,14 +460,16 @@ function apPopup(ap) {
     ${mt ? `<div class="mono text-[11px] text-slate-200 bg-black/30 rounded-lg px-1.5 py-1">${esc(mt.raw)}</div>` : wx ? `<div class="mono text-[11px] text-slate-300">${pad3(wx.wdir)}/${wx.wspd}${wx.gust > wx.wspd + 5 ? "G" + wx.gust : ""}kt • VIS ${wx.vis.toFixed(1)}km • ${wx.temp}°C • Q${wx.qnh} <span class="text-slate-500">(โมเดล)</span></div>` : ""}
     <div class="text-[11px] text-slate-300">RWY: ${ap.runways.join(", ")}</div>
     <div class="mono text-[10px] text-emerald-300 bg-black/30 rounded-lg px-1.5 py-1">${Object.entries(ap.atc).map(([k, v]) => `<span class="mr-1.5"><span class="text-slate-400">${k}</span> ${v}</span>`).join("")}</div>
+    ${navaidRows(ap, "text-[11px]")}
     <div class="flex gap-1.5 pt-1"><button onclick="addKey('AP:${ap.icao}')" class="btn btn-sm btn-go flex-1">+ เส้นทาง</button><button onclick="inspectAirport('${ap.icao}')" class="btn btn-sm">รายละเอียด</button></div></div>`;
 }
 function renderMapMarkers() {
   L_ap.clearLayers(); L_nav.clearLayers(); L_ring.clearLayers(); L_vfr.clearLayers();
   AIRPORTS.forEach(ap => {
-    const crit = state.notams.some(n => n.icao === ap.icao && n.severity === "critical"), any = state.notams.some(n => n.icao === ap.icao);
-    const bg = crit ? "#ef4444" : any ? "#f5a524" : "#22c55e";
-    const icon = L.divIcon({ className: "", html: `<div class="ap-badge" style="width:38px;height:20px;background:${bg};color:#060a13">${ap.icao}</div>`, iconSize: [38, 20], iconAnchor: [19, 10] });
+    const fc = flightCat(ap.icao), metar = fc.src === "METAR";
+    const bg = metar ? (fc.imc ? "#ef4444" : "#22c55e") : "#64748b", fg = metar && !fc.imc ? "#060a13" : "#fff";
+    const crit = state.notams.some(n => n.icao === ap.icao && n.severity === "critical");
+    const icon = L.divIcon({ className: "", html: `<div class="ap-badge" style="position:relative;width:38px;height:20px;background:${bg};color:${fg}" title="${fc.label}">${ap.icao}${crit ? `<span style="position:absolute;top:-5px;right:-5px;width:9px;height:9px;border-radius:9px;background:#f5a524;border:1.5px solid #fff"></span>` : ""}</div>`, iconSize: [38, 20], iconAnchor: [19, 10] });
     L.marker([ap.lat, ap.lon], { icon }).bindPopup(() => apPopup(ap)).addTo(L_ap);
   });
   VOR_STATIONS.forEach(v => {
@@ -737,18 +767,23 @@ function routeNotamHits() {
   return hits.sort((a, b) => (b.active - a.active) || (b.inside - a.inside) || ((a.n.severity === "critical" ? 0 : 1) - (b.n.severity === "critical" ? 0 : 1)) || a.dist - b.dist);
 }
 // flight category: real METAR first, model fallback
+const METAR_MAX_AGE = 150;   // minutes — older reports are treated as "no current METAR"
+// VMC per ICAO Annex 2 / Thai AIP ENR 1.2 inside a control zone: visibility ≥ 5 km and ceiling ≥ 1,500 ft, no fog / VV.
 function flightCat(icao) {
   const mt = state.metar[icao], vmin = num(S.vismin), cmin = num(S.ceilmin);
-  if (mt) {
+  if (mt && (Date.now() - mt.obs) / 6e4 <= METAR_MAX_AGE) {
     const wx = mt.wx || "";
-    const bad = mt.vis < vmin || (mt.ceil != null && mt.ceil < cmin) || /TS|\+RA|FG|SQ/.test(wx);
-    const marg = !bad && (mt.vis < vmin * 1.6 || (mt.ceil != null && mt.ceil < cmin * 1.5) || mt.gust >= 25 || /RA|SH|BR|HZ|FU|DU/.test(wx));
-    return bad ? { label: "ต่ำกว่าขั้นต่ำ", cls: "pill-stop", ok: false, src: "METAR" } : marg ? { label: "MARGINAL", cls: "pill-warn", ok: true, marg: true, src: "METAR" } : { label: "VMC", cls: "pill-go", ok: true, src: "METAR" };
+    const imc = mt.vis < 5 || (mt.ceil != null && mt.ceil < 1500) || mt.vv || /(^|\s)[-+]?(FG|FZFG)\b/.test(wx);
+    if (imc) return { label: "IMC", cls: "pill-stop", ok: false, imc: true, src: "METAR" };
+    const below = mt.vis < vmin || (mt.ceil != null && mt.ceil < cmin);
+    const hazard = /(^|\s)[-+]?TS|SQ|FC|\+RA|\+SHRA/.test(wx) || mt.gust >= 25;
+    if (below || hazard) return { label: below ? "VMC • ต่ำกว่าขั้นต่ำที่ตั้ง" : "VMC • " + (mt.gust >= 25 ? `ลมกระโชก ${mt.gust}kt` : "TS/ฝนหนัก"), cls: "pill-warn", ok: true, marg: true, imc: false, src: "METAR" };
+    return { label: "VMC", cls: "pill-go", ok: true, imc: false, src: "METAR" };
   }
-  const wx = state.weather[icao]; if (!wx) return { label: "N/A", cls: "pill-info", ok: null };
-  const ceil = wx.cloud >= 60 ? wx.base : null, bad = wx.vis < vmin || (ceil != null && ceil < cmin) || wx.rain > 4;
-  const marg = !bad && (wx.vis < vmin * 1.6 || (ceil != null && ceil < cmin * 1.5) || wx.rain > 1 || wx.gust >= 25);
-  return bad ? { label: "IMC/ต่ำกว่าขั้นต่ำ", cls: "pill-stop", ok: false, src: "MODEL" } : marg ? { label: "MARGINAL", cls: "pill-warn", ok: true, marg: true, src: "MODEL" } : { label: "VMC", cls: "pill-go", ok: true, src: "MODEL" };
+  if (mt) return { label: "METAR เก่า", cls: "pill-info", ok: null, src: "STALE" };
+  const wx = state.weather[icao]; if (!wx) return { label: "ไม่มี METAR", cls: "pill-info", ok: null };
+  const ceil = wx.cloud >= 60 ? wx.base : null, bad = wx.vis < 5 || (ceil != null && ceil < 1500);
+  return bad ? { label: "IMC? (โมเดล)", cls: "pill-warn", ok: true, marg: true, src: "MODEL" } : { label: "VMC? (โมเดล)", cls: "pill-info", ok: true, marg: true, src: "MODEL" };
 }
 function wxLine(ap, tag) {
   const wx = state.weather[ap.icao], mt = state.metar[ap.icao], taf = state.taf[ap.icao], fc = flightCat(ap.icao);
@@ -852,16 +887,16 @@ function showAirportDetail(icao) {
     ${wxLine(ap, "WX")}
     <div class="text-[12px] text-slate-300"><b>RWY:</b> ${ap.runways.join(", ")} • <span class="mono">☀ ${ict(st.rise)}–${ict(st.set)}</span></div>
     <div class="grid grid-cols-2 gap-1">${Object.entries(ap.atc).map(([k, v]) => `<div class="flex justify-between bg-[#070b14] border border-[#1c2638] rounded-lg px-2 py-1 mono text-[12px]"><span class="text-slate-400">${k}</span><span class="text-emerald-300 text-right">${v}</span></div>`).join("")}</div>
-    ${ap.navaids.length ? ap.navaids.map(n => `<div class="flex justify-between text-[12px] mono"><span class="text-sky-300">${n.id} ${n.type}</span><span>${n.freq} ${n.ch}</span></div>`).join("") : ""}
+    ${navaidRows(ap)}
     <div class="text-[12px] bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-xl p-2"><b>Heli note:</b> ${esc(ap.heliNote)}</div>
     <div class="flex gap-2"><button onclick="addKey('AP:${ap.icao}')" class="btn btn-go flex-1">+ เพิ่มในแผนบิน</button><button id="ap-fly" class="btn">โฟกัสแผนที่</button></div>`;
   $("ap-close").onclick = () => c.classList.add("hidden"); $("ap-fly").onclick = () => map.flyTo([ap.lat, ap.lon], 11);
 }
 function renderAirportsList() {
   const q = $("airport-search").value.trim().toLowerCase();
-  const list = AIRPORTS.filter(a => !q || [a.icao, a.iata, a.name, a.nameTh, ...a.navaids.map(n => n.id)].some(s => s.toLowerCase().includes(q)));
+  const list = AIRPORTS.filter(a => !q || [a.icao, a.iata, a.name, a.nameTh, ...a.navaids.map(n => n.id), ...a.ils.map(l => l.id || "")].some(s => s.toLowerCase().includes(q)));
   $("airports-list").innerHTML = list.map(a => { const fc = flightCat(a.icao); return `<div data-ap="${a.icao}" class="bg-[#0c1322] border border-[#1c2638] hover:border-amber-500/40 rounded-xl p-2.5 flex items-center justify-between gap-2 cursor-pointer transition">
-      <div class="min-w-0"><div class="flex items-center gap-1.5"><b class="mono text-[13px] text-emerald-300">${a.icao}</b><span class="pill ${fc.cls}">${fc.label}</span>${fc.src === "METAR" ? `<span class="text-[9.5px] text-slate-500">METAR</span>` : ""}<span class="text-[13px] truncate">${esc(a.nameTh)}</span></div><div class="mono text-[11px] text-slate-400 truncate">${fmtLL(a.lat, a.lon)} • ${a.elev} ft</div></div>
+      <div class="min-w-0"><div class="flex items-center gap-1.5"><b class="mono text-[13px] text-emerald-300">${a.icao}</b><span class="pill ${fc.cls}">${fc.label}</span>${fc.src === "METAR" ? `<span class="text-[9.5px] text-slate-500">METAR</span>` : ""}<span class="text-[13px] truncate">${esc(a.nameTh)}</span></div><div class="mono text-[11px] text-slate-400 truncate">${fmtLL(a.lat, a.lon)} • ${a.elev} ft${a.navaids.length ? " • " + a.navaids.filter(n => /VOR/.test(n.type)).map(n => n.id).join("/") : ""}${a.ils.length ? ` • <span class="text-fuchsia-300">ILS ${a.ils.map(l => l.rwy).join("/")}</span>` : ""}</div></div>
       <button data-add="${a.icao}" class="btn btn-sm btn-go shrink-0">+</button></div>`; }).join("");
 }
 $("airports-list").addEventListener("click", e => { const add = e.target.closest("[data-add]"); if (add) { e.stopPropagation(); window.addKey("AP:" + add.dataset.add); return; } const row = e.target.closest("[data-ap]"); if (row) { const a = AIRPORTS.find(x => x.icao === row.dataset.ap); map.flyTo([a.lat, a.lon], 10); showAirportDetail(a.icao); } });
@@ -869,6 +904,7 @@ $("airport-search").addEventListener("input", renderAirportsList);
 
 function renderNotams() {
   const list = filteredNotams(); $("notam-count-badge").textContent = state.notams.length;
+  $("notam-expired-note").textContent = state.notamsExpired ? `ซ่อน ${state.notamsExpired} รายการที่หมดอายุแล้ว` : "";
   const now = new Date();
   $("notams-list").innerHTML = list.length ? list.map(n => { const v = notamValidity(n), exp = v && v.to < now, sty = { critical: "border-rose-500/40 bg-rose-950/15", caution: "border-amber-500/40 bg-amber-950/15", info: "border-[#1c2638] bg-[#0c1322]" }[n.severity] || "";
     return `<div class="border rounded-xl p-2.5 space-y-1 ${sty} ${exp ? "opacity-50" : ""}"><div class="flex justify-between gap-2"><span class="mono text-[12px]"><b class="text-white">${esc(n.icao)}</b> ${esc(n.id)}${n.series === "LOCAL" ? ` <span class="pill pill-info">เพิ่มเอง</span>` : ""}</span><span class="flex gap-1">${exp ? `<span class="pill pill-info">หมดอายุ</span>` : ""}<span class="pill ${n.severity === "critical" ? "pill-stop" : n.severity === "caution" ? "pill-warn" : "pill-info"}">${esc(n.category)}</span></span></div>
@@ -880,7 +916,7 @@ function renderNotams() {
 $("notams-list").addEventListener("click", e => {
   const f = e.target.closest("[data-nfly]"), d = e.target.closest("[data-ndel]");
   if (f) { const n = state.notams.find(x => x.id === f.dataset.nfly), g = n && notamGeom(n); if (g) map.flyTo(g.center, 10); }
-  if (d) { state.customNotams = state.customNotams.filter(x => x.id !== d.dataset.ndel); LS.set(K.notams, state.customNotams); state.notams = [...state.customNotams, ...AEROTHAI_NOTAMS]; renderNotams(); renderMapMarkers(); renderBrief(); }
+  if (d) { state.customNotams = state.customNotams.filter(x => x.id !== d.dataset.ndel); LS.set(K.notams, state.customNotams); rebuildNotams(); renderNotams(); renderMapMarkers(); renderBrief(); }
 });
 ["notam-icao-filter", "notam-cat-filter"].forEach(id => $(id).addEventListener("change", renderNotams));
 $("btn-open-notam-form").onclick = () => $("notam-form").classList.toggle("hidden");
@@ -889,7 +925,7 @@ $("notam-form").addEventListener("submit", e => {
   e.preventDefault();
   const n = { id: $("nn-id").value.trim() || `LOCAL-${Date.now() % 100000}`, series: "LOCAL", icao: $("nn-icao").value, category: $("nn-cat").value, severity: $("nn-sev").value, title: $("nn-title").value.trim(), body: $("nn-body").value.trim().toUpperCase(), valid: $("nn-valid").value.trim() || "PRE-FLIGHT NOTE" };
   if (!n.title || !n.body) return;
-  state.customNotams.unshift(n); LS.set(K.notams, state.customNotams); state.notams = [...state.customNotams, ...AEROTHAI_NOTAMS];
+  state.customNotams.unshift(n); LS.set(K.notams, state.customNotams); rebuildNotams();
   e.target.reset(); e.target.classList.add("hidden"); renderNotams(); renderMapMarkers(); renderBrief();
   toast(notamGeom(n) && parseNotamCoords(n.body).length ? "เพิ่ม NOTAM และวาดบนแผนที่แล้ว" : "เพิ่ม NOTAM แล้ว (ไม่พบพิกัด — ใช้ตำแหน่งสนามบิน)");
 });
@@ -1031,14 +1067,13 @@ $("btn-pax-calc").onclick = () => { S.pax = num($("pax-n").value) * 190; $("s-pa
 // =========================================================================
 $("bm-gallery").addEventListener("click", e => { const b = e.target.closest("[data-bm]"); if (b) setBasemap(b.dataset.bm); });
 $("coord-format-select").onchange = e => { S.coord = e.target.value; saveS(); renderRoute(); renderCwps(); renderAirportsList(); renderMapMarkers(); map.closePopup(); };
-const LAYER_TOGGLES = ["tg-airports", "tg-navaids", "tg-vfr", "tg-cwp", "tg-notams", "tg-rings", "tg-terrain", "tg-radar", "tg-metar", "tg-wind", "tg-sat", "tg-osm-heli", "tg-osm-power", "tg-osm-obst", "tg-traffic", "tg-openaip"];
+const LAYER_TOGGLES = ["tg-airports", "tg-navaids", "tg-vfr", "tg-cwp", "tg-notams", "tg-rings", "tg-terrain", "tg-radar", "tg-metar", "tg-wind", "tg-sat", "tg-osm-heli", "tg-osm-power", "tg-osm-obst", "tg-openaip"];
 function saveLayers() { const o = {}; LAYER_TOGGLES.forEach(id => o[id] = $(id).checked); o.windLevel = $("wind-level").value; o.satLayer = $("sat-layer").value; o.satDay = $("sat-day").value; LS.set(K.layers, o); }
 const tg = (id, layer, extra) => $(id).addEventListener("change", e => { e.target.checked ? layer.addTo(map) : map.removeLayer(layer); extra && extra(e.target.checked); saveLayers(); });
 tg("tg-airports", L_ap); tg("tg-navaids", L_nav); tg("tg-vfr", L_vfr); tg("tg-cwp", L_cwp); tg("tg-notams", L_notam); tg("tg-rings", L_ring);
 tg("tg-terrain", L_terr, scheduleTerrainOverlay);
 tg("tg-metar", L_metar, on => on && !Object.keys(state.metar).length && loadMetar());
 tg("tg-wind", L_wind, on => on ? scheduleWind(0) : setSrc("ลม", null));
-tg("tg-traffic", L_traffic, on => { if (on) { loadTraffic(); } else { state.traffic = []; L_traffic.clearLayers(); setSrc("ADS-B", null); } });
 tg("tg-osm-heli", L_osmHeli, () => scheduleOsm(0)); tg("tg-osm-power", L_osmPower, () => scheduleOsm(0)); tg("tg-osm-obst", L_osmObst, () => scheduleOsm(0));
 $("tg-radar").addEventListener("change", () => { applyRadar(state.radar.index); saveLayers(); });
 $("tg-sat").addEventListener("change", () => { applySat(); saveLayers(); });
@@ -1059,7 +1094,7 @@ $("btn-zoom-in").onclick = () => map.zoomIn(); $("btn-zoom-out").onclick = () =>
 $("btn-layers").onclick = () => { const p = $("layer-panel"); p.classList.toggle("hidden"); $("btn-layers").classList.toggle("on", !p.classList.contains("hidden")); };
 $("btn-layers-close").onclick = () => { $("layer-panel").classList.add("hidden"); $("btn-layers").classList.remove("on"); };
 const geUrl = (la, lo) => `https://earth.google.com/web/@${la.toFixed(6)},${lo.toFixed(6)},1200a,6000d,35y,0h,0t,0r`;
-map.on("moveend", () => { const c = map.getCenter(); $("btn-google-earth").href = geUrl(c.lat, c.lng); scheduleOsm(); if (map.hasLayer(L_traffic)) scheduleTraffic(); if (map.hasLayer(L_wind)) scheduleWind(); });
+map.on("moveend", () => { const c = map.getCenter(); $("btn-google-earth").href = geUrl(c.lat, c.lng); scheduleOsm(); if (map.hasLayer(L_wind)) scheduleWind(); });
 
 async function elevAt(lat, lon) { const d = await (await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}`)).json(); return d.elevation[0]; }
 map.on("click", async e => {
@@ -1126,11 +1161,6 @@ $("fly-takeoff").onclick = () => {
   else { state.fly.landed = Date.now(); toast(`Landing ${utc(new Date())} • เวลาบิน ${hhmm((state.fly.landed - state.fly.takeoff) / 3600e3)}`); }
   saveFly(); updateFly();
 };
-function nearestTraffic(g) {
-  let best = null;
-  for (const a of state.traffic) { if (a.gnd) continue; const d = distNM(g.lat, g.lon, a.lat, a.lon); if (!best || d < best.d) best = { ...a, d, brg: brgT(g.lat, g.lon, a.lat, a.lon), dAlt: a.alt != null && g.alt != null ? a.alt - g.alt : null }; }
-  return best;
-}
 function updateFly() {
   const r = state.route, f = state.fly, g = state.gps, tgt = r[f.target], prev = r[f.target - 1], leg = state.legs[f.target - 1], dest = r[r.length - 1];
   const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
@@ -1144,17 +1174,10 @@ function updateFly() {
   set("t-mh", leg ? pad3(leg.mh) + "°" : "--"); set("t-mh-s", leg ? `TC ${pad3(leg.tc)} • WCA ${leg.wca >= 0 ? "+" : ""}${leg.wca.toFixed(0)}°` : "--");
   set("t-msa", leg && leg.msa ? fmt(leg.msa) : "--");
   const dap = dest && AIRPORTS.find(a => a.icao === dest.id);
-  $("t-freq").innerHTML = dap ? Object.entries(dap.atc).map(([k, v]) => `<span class="mr-3"><span class="text-slate-400">${k}</span> ${esc(v)}</span>`).join("") : "—";
-  if (!g) { $("fly-gps").className = "pill pill-warn"; $("fly-gps").textContent = "รอ GPS"; ["t-dist", "t-brg", "t-ete", "t-gs", "t-xte", "t-alt", "t-ddist", "t-tfc"].forEach(id => set(id, "--")); return; }
+  $("t-freq").innerHTML = dap ? Object.entries(dap.atc).map(([k, v]) => `<span class="mr-3"><span class="text-slate-400">${k}</span> ${esc(v)}</span>`).join("") + dap.ils.map(l => `<span class="mr-3 text-fuchsia-300"><span class="text-slate-400">ILS ${esc(l.rwy)}</span> ${esc(l.freq || "AIP")}</span>`).join("") : "—";
+  if (!g) { $("fly-gps").className = "pill pill-warn"; $("fly-gps").textContent = "รอ GPS"; ["t-dist", "t-brg", "t-ete", "t-gs", "t-xte", "t-alt", "t-ddist"].forEach(id => set(id, "--")); return; }
   const age = (Date.now() - g.t) / 1000; $("fly-gps").className = `pill ${age < 10 && g.acc < 100 ? "pill-go" : "pill-warn"}`; $("fly-gps").textContent = `GPS ±${Math.round(g.acc)}m${age > 10 ? " (เก่า)" : ""}`;
   set("t-gs", Math.round(g.gs)); set("t-alt", g.alt != null ? fmt(g.alt) : "--");
-  // traffic
-  const tile = $("t-tfc-tile");
-  if (map.hasLayer(L_traffic)) {
-    const tf = nearestTraffic(g);
-    if (tf && tf.d < 30) { set("t-tfc", tf.d < 10 ? tf.d.toFixed(1) : Math.round(tf.d)); set("t-tfc-s", `NM • ${tf.cs} @${pad3(toMag(tf.brg))}°${tf.dAlt != null ? ` • ${tf.dAlt >= 0 ? "+" : ""}${fmt(tf.dAlt)} ft` : ""}`); tile.classList.toggle("tfc-alert", tf.d < 3 && (tf.dAlt == null || Math.abs(tf.dAlt) < 1000)); }
-    else { set("t-tfc", "—"); set("t-tfc-s", "ไม่มีในรัศมี 30 NM"); tile.classList.remove("tfc-alert"); }
-  } else { set("t-tfc", "--"); set("t-tfc-s", 'เปิดชั้น "ADS-B Traffic"'); tile.classList.remove("tfc-alert"); }
   if (!tgt) return;
   const d = distNM(g.lat, g.lon, tgt.lat, tgt.lon), b = toMag(brgT(g.lat, g.lon, tgt.lat, tgt.lon));
   set("t-dist", d < 10 ? d.toFixed(1) : Math.round(d)); set("t-brg", pad3(b) + "°"); set("t-brg-s", `TRK ${pad3(toMag(g.trk))}°M`);
@@ -1225,34 +1248,37 @@ let metarBusy = false;
 function parseAwc(m) {
   const v = String(m.visib ?? "10"), vsm = parseFloat(v);
   const cl = Array.isArray(m.clouds) ? m.clouds : [];
-  const ceil = cl.filter(c => /BKN|OVC|OVX|VV/.test(c.cover || "")).map(c => c.base).filter(x => x != null).sort((a, b) => a - b)[0] ?? null;
+  let ceil = cl.filter(c => /BKN|OVC|OVX|VV/.test(c.cover || "")).map(c => c.base).filter(x => x != null).sort((a, b) => a - b)[0] ?? null;
+  const vvm = String(m.rawOb || "").match(/\bVV(\d{3}|\/\/\/)/); if (vvm) ceil = vvm[1] === "///" ? 0 : Math.min(ceil ?? 1e9, +vvm[1] * 100);
+  const vism = String(m.rawOb || "").match(/\s(\d{4})(?:NDV)?\s/);   // ICAO metres group is more precise than AWC's statute-mile conversion
   const t = typeof m.obsTime === "number" ? m.obsTime * 1000 : Date.parse(m.reportTime || m.obsTime || "");
   return { raw: m.rawOb || "", obs: new Date(isFinite(t) ? t : Date.now()), wdir: typeof m.wdir === "number" ? m.wdir : null, wspd: m.wspd || 0, gust: m.wgst || 0, temp: m.temp, dew: m.dewp, qnh: Math.round(m.altim || 1013),
-    vis: v.includes("+") || !isFinite(vsm) ? 10 : Math.min(10, vsm * 1.609), ceil, fltCat: m.fltCat || "", wx: m.wxString || "" };
+    vis: vism ? (+vism[1] >= 9999 ? 10 : +vism[1] / 1000) : v.includes("+") || !isFinite(vsm) ? 10 : Math.min(10, vsm * 1.609), ceil, vv: !!vvm, fltCat: m.fltCat || "", wx: m.wxString || "" };
 }
 async function loadMetar() {
   if (metarBusy) return; metarBusy = true;
   const ids = AIRPORTS.map(a => a.icao).join(",");
   try {
-    const r = await fetch(`https://aviationweather.gov/api/data/metar?ids=${ids}&format=json&hours=3`);
+    const r = await fetch(`https://aviationweather.gov/api/data/metar?ids=${ids}&format=json&hours=3&_=${Date.now()}`, { cache: "no-store" });
+    if (r.headers.get("X-THV-Offline")) throw new Error("offline");
     if (!r.ok) throw new Error(r.status);
     const d = await r.json(), best = {};
     (Array.isArray(d) ? d : []).forEach(m => { const p = parseAwc(m); if (!best[m.icaoId] || p.obs > best[m.icaoId].obs) best[m.icaoId] = p; });
-    state.metar = best; const n = Object.keys(best).length;
+    state.metar = best; state.metarAt = Date.now(); const n = Object.keys(best).length;
     $("metar-status").textContent = `${n} สถานี • อัปเดต ${ict(new Date())} ICT`; setSrc("METAR", `${n} สถานี`, true);
   } catch (e) { $("metar-status").textContent = "เชื่อมต่อไม่ได้ — ใช้ค่าโมเดลแทน"; setSrc("METAR", "เชื่อมต่อไม่ได้", false); }
   try {
-    const r = await fetch(`https://aviationweather.gov/api/data/taf?ids=${ids}&format=json`);
+    const r = await fetch(`https://aviationweather.gov/api/data/taf?ids=${ids}&format=json&_=${Date.now()}`, { cache: "no-store" });
     if (r.ok) { const d = await r.json(); state.taf = {}; (Array.isArray(d) ? d : []).forEach(t => { if (!state.taf[t.icaoId] && t.rawTAF) state.taf[t.icaoId] = t.rawTAF; }); }
   } catch (_) {}
   metarBusy = false;
-  renderMetarLayer(); renderWxCards(); renderAirportsList(); renderBrief();
+  renderMetarLayer(); renderMapMarkers(); renderWxCards(); renderAirportsList(); renderBrief();
 }
 function renderMetarLayer() {
   L_metar.clearLayers();
   AIRPORTS.forEach(ap => {
     const mt = state.metar[ap.icao]; if (!mt) return;
-    const fc = flightCat(ap.icao), col = fc.cls === "pill-go" ? "#22c55e" : fc.cls === "pill-warn" ? "#f5a524" : fc.cls === "pill-stop" ? "#ef4444" : "#38bdf8";
+    const fc = flightCat(ap.icao), col = fc.src !== "METAR" ? "#64748b" : fc.imc ? "#ef4444" : "#22c55e";
     const arrow = mt.wdir != null && mt.wspd > 0 ? `<svg width="16" height="16" viewBox="0 0 16 16" style="transform:rotate(${mt.wdir + 180}deg)"><path d="M8 1 L12 9 L8.8 8 L8.8 15 L7.2 15 L7.2 8 L4 9 Z" fill="#e2e8f0"/></svg>` : "";
     const wind = mt.wspd > 0 ? `${mt.wdir == null ? "VRB" : pad3(mt.wdir)}/${mt.wspd}${mt.gust ? "G" + mt.gust : ""}` : "CALM";
     const html = `<div style="display:inline-flex;align-items:center;gap:3px;white-space:nowrap;transform:translate(22px,-8px)"><span style="width:10px;height:10px;border-radius:99px;background:${col};border:1.5px solid #fff;box-shadow:0 0 6px ${col}"></span>${arrow}<span class="lbl-tag" style="color:#e2e8f0;border:1px solid ${col}88">${wind} ${mt.vis >= 10 ? "10+" : mt.vis.toFixed(1)}km${mt.ceil != null ? " " + Math.round(mt.ceil / 100) * 100 + "ft" : ""}</span></div>`;
@@ -1424,47 +1450,6 @@ async function scanRouteObstacles() {
 }
 $("btn-scan-obst").onclick = scanRouteObstacles;
 
-// ---- 15f. Live ADS-B traffic ----
-let trafficDeb = null, trafficBusy = false;
-function scheduleTraffic() { clearTimeout(trafficDeb); trafficDeb = setTimeout(loadTraffic, 1200); }
-async function loadTraffic() {
-  if (!map.hasLayer(L_traffic) || trafficBusy) return; trafficBusy = true;
-  const c = map.getCenter(), b = map.getBounds(), rad = Math.min(250, Math.max(20, Math.round(distNM(c.lat, c.lng, b.getNorth(), b.getEast()))));
-  let list = null, src = "";
-  for (const [n, u] of [["airplanes.live", `https://api.airplanes.live/v2/point/${c.lat.toFixed(3)}/${c.lng.toFixed(3)}/${rad}`], ["adsb.lol", `https://api.adsb.lol/v2/point/${c.lat.toFixed(3)}/${c.lng.toFixed(3)}/${rad}`]]) {
-    try { const r = await fetch(u); if (!r.ok) continue; const d = await r.json(); if (!Array.isArray(d.ac)) continue;
-      list = d.ac.filter(a => a.lat != null && a.lon != null).map(a => ({ hex: a.hex, cs: (a.flight || "").trim() || a.r || a.hex, lat: a.lat, lon: a.lon, gnd: a.alt_baro === "ground", alt: a.alt_baro === "ground" ? 0 : (typeof a.alt_baro === "number" ? a.alt_baro : a.alt_geom ?? null), gs: a.gs ?? null, trk: a.track ?? a.true_heading ?? 0, type: a.t || "", reg: a.r || "", heli: a.category === "A7", sq: a.squawk || "" }));
-      src = n; break; } catch (_) {}
-  }
-  if (!list) {
-    try { const d = await (await fetch(`https://opensky-network.org/api/states/all?extended=1&lamin=${b.getSouth().toFixed(2)}&lomin=${b.getWest().toFixed(2)}&lamax=${b.getNorth().toFixed(2)}&lomax=${b.getEast().toFixed(2)}`)).json();
-      list = (d.states || []).filter(s => s[6] != null).map(s => ({ hex: s[0], cs: (s[1] || "").trim() || s[0], lat: s[6], lon: s[5], gnd: !!s[8], alt: s[7] != null ? s[7] * 3.28084 : null, gs: s[9] != null ? s[9] * 1.94384 : null, trk: s[10] || 0, type: "", reg: "", heli: s[17] === 8, sq: s[14] || "" }));
-      src = "OpenSky"; } catch (_) {}
-  }
-  trafficBusy = false;
-  if (!map.hasLayer(L_traffic)) return;
-  if (!list) { setSrc("ADS-B", "เชื่อมต่อไม่ได้", false); return; }
-  state.traffic = list; renderTraffic(src);
-}
-function acSvg(a) {
-  const col = a.gnd ? "#64748b" : a.alt != null && a.alt <= 3000 ? "#fbbf24" : a.alt != null && a.alt <= 10000 ? "#22d3ee" : "#cbd5e1";
-  const body = a.heli
-    ? `<circle cx="12" cy="11" r="4.2" fill="${col}" stroke="#0b0f19" stroke-width="1"/><rect x="11.2" y="14" width="1.6" height="8" fill="${col}"/><line x1="3" y1="4" x2="21" y2="18" stroke="${col}" stroke-width="1.6"/><line x1="21" y1="4" x2="3" y2="18" stroke="${col}" stroke-width="1.6"/>`
-    : `<path d="M12 2 L13.4 9 L21 13 L21 15 L13.4 12.6 L13 18 L15.5 20 L15.5 21.5 L12 20.5 L8.5 21.5 L8.5 20 L11 18 L10.6 12.6 L3 15 L3 13 L10.6 9 Z" fill="${col}" stroke="#0b0f19" stroke-width="1"/>`;
-  return { col, svg: `<svg class="ac-ic" width="24" height="24" viewBox="0 0 24 24" style="transform:rotate(${Math.round(a.trk || 0)}deg);filter:drop-shadow(0 0 3px rgba(0,0,0,.9))">${body}</svg>` };
-}
-function renderTraffic(src) {
-  L_traffic.clearLayers(); const showLbl = map.getZoom() >= 8;
-  state.traffic.forEach(a => {
-    const { col, svg } = acSvg(a), fl = a.gnd ? "GND" : a.alt != null ? (a.alt < 18000 ? String(Math.round(a.alt / 100)).padStart(3, "0") : "FL" + Math.round(a.alt / 100)) : "";
-    const html = `<div style="position:relative;width:24px;height:24px">${svg}${showLbl ? `<span class="lbl-tag" style="position:absolute;left:22px;top:-4px;color:${col}">${esc(a.cs)} ${fl}</span>` : ""}</div>`;
-    L.marker([a.lat, a.lon], { pane: "trafficPane", icon: L.divIcon({ className: "", html, iconSize: [24, 24], iconAnchor: [12, 12] }) })
-      .bindPopup(`<div class="text-xs space-y-1 min-w-[190px]"><b class="text-amber-300 mono">${esc(a.cs)}</b> ${a.heli ? `<span class="pill pill-info">HELI</span>` : ""}<div class="mono text-[11px] text-slate-300">${esc(a.type)} ${esc(a.reg)} • ${esc(a.hex)}</div><div class="mono text-[12px]">ALT ${a.gnd ? "GND" : a.alt != null ? fmt(a.alt) + " ft" : "—"} • GS ${a.gs != null ? Math.round(a.gs) : "—"} kt • TRK ${pad3(a.trk || 0)}°T${a.sq ? ` • SQ ${esc(a.sq)}` : ""}</div><div class="text-[10px] text-slate-500">${esc(src)} — ไม่ใช่ระบบหลีกเลี่ยงการชน</div></div>`).addTo(L_traffic);
-  });
-  setSrc("ADS-B", `${state.traffic.length} ลำ (${src})`, true);
-  if (state.fly.on) updateFly();
-}
-setInterval(() => { if (map.hasLayer(L_traffic) && !document.hidden) loadTraffic(); }, 15000);
 
 // =========================================================================
 // 16. UI SHELL: TABS, BOTTOM SHEET, CLOCKS & BOOT
@@ -1590,7 +1575,9 @@ function tileUrl(layer, x, y, z) {
   return L.Util.template(layer._url, { s, x, y, z, r: L.Browser.retina ? "@2x" : "" });
 }
 function offlineTiles(key, bufNM, maxZ) {
-  const layer = BASEMAPS[key].l, mz = Math.min(maxZ, layer.options.maxZoom || 18), set = new Set(), out = [];
+  const base = BASEMAPS[key].l, layers = base.getLayers ? base.getLayers() : [base], set = new Set(), out = [];
+  for (const layer of layers) {
+  const mz = Math.min(maxZ, layer.options.maxZoom || 18);
   const pts = state.route.length ? state.route : [{ lat: map.getCenter().lat, lon: map.getCenter().lng }];
   for (let z = 6; z <= mz; z++) {
     for (let i = 0; i < Math.max(1, pts.length - 1); i++) {
@@ -1599,9 +1586,10 @@ function offlineTiles(key, bufNM, maxZ) {
         const la = a.lat + (b.lat - a.lat) * k / steps, lo = a.lon + (b.lon - a.lon) * k / steps;
         const dLa = bufNM / 60, dLo = bufNM / (60 * Math.cos(toRad(la)));
         const x0 = lon2x(lo - dLo, z), x1 = lon2x(lo + dLo, z), y0 = lat2y(la + dLa, z), y1 = lat2y(la - dLa, z);
-        for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) { const id = `${z}/${x}/${y}`; if (!set.has(id)) { set.add(id); out.push(tileUrl(layer, x, y, z)); } }
+        for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) { const u = tileUrl(layer, x, y, z); if (!set.has(u)) { set.add(u); out.push(u); } }
       }
     }
+  }
   }
   return out;
 }
@@ -1717,6 +1705,9 @@ function handleLaunchParams() {
 }
 document.addEventListener("visibilitychange", () => { if (state.fly.on && document.visibilityState === "visible") setWake(true); });
 
+rebuildNotams();
+setInterval(() => { const n = state.notams.length; rebuildNotams(); if (n !== state.notams.length) { renderNotams(); renderMapMarkers(); renderBrief(); } }, 30 * 60e3);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && navigator.onLine && (!state.metarAt || Date.now() - state.metarAt > 5 * 60e3)) { loadMetar(); loadRadar(); } });
 (async function boot() {
   setSheet(window.innerHeight < 700 ? "peek" : "half");
   if (!state.cwps.length) { const v = await idbGet(K.wps); if (Array.isArray(v)) state.cwps = v; }

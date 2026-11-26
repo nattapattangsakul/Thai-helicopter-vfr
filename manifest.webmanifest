@@ -2,7 +2,7 @@
   "id": "./",
   "name": "THAI HELI-VFR EFB",
   "short_name": "HELI-VFR",
-  "description": "Electronic Flight Bag สำหรับวางแผนและบิน VFR เฮลิคอปเตอร์ในประเทศไทย — Navlog แก้ลม, น้ำมัน/น้ำหนัก, NOTAM, METAR/TAF, เรดาร์ฝน, สิ่งกีดขวาง, ADS-B และโหมดบิน GPS",
+  "description": "Electronic Flight Bag สำหรับวางแผนและบิน VFR เฮลิคอปเตอร์ในประเทศไทย — Navlog แก้ลม, น้ำมัน/น้ำหนัก, NOTAM, METAR/TAF, เรดาร์ฝน, สิ่งกีดขวาง และโหมดบิน GPS",
   "lang": "th",
   "dir": "ltr",
   "start_url": "./?source=pwa",
