@@ -1,5 +1,5 @@
 /* THAI HELI-VFR EFB — service worker (generated from scripts/sw.template.js by `npm run build`) */
-const VERSION = "d013025ddc";
+const VERSION = "d56aed710f";
 const SHELL = `thv-shell-${VERSION}`;
 const TILES = "thv-tiles-v1";      // basemap tiles (also filled by "ดาวน์โหลดแผนที่ออฟไลน์")
 const LIB = "thv-lib-v1";         // on-demand libraries (pdf.js for NOTAM import)
@@ -10,9 +10,9 @@ const PRECACHE = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./css/app.css",
   "./css/fonts.css",
-  "./js/app.js",
+  "./assets/app.f493244104.css",
+  "./assets/app.af2db323e1.js",
   "./vendor/leaflet/images/layers-2x.png",
   "./vendor/leaflet/images/layers.png",
   "./vendor/leaflet/images/marker-icon-2x.png",
@@ -48,7 +48,8 @@ const DATA_HOSTS = /(^|\.)(api\.open-meteo\.com|aviationweather\.gov|api\.rainvi
 const NO_CACHE_HOSTS = /(^|\.)(tilecache\.rainviewer\.com)$/;
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(SHELL).then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: "reload" })))));
+  // activate as soon as the new shell is cached — the page reloads itself on controllerchange
+  e.waitUntil(caches.open(SHELL).then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", e => {
