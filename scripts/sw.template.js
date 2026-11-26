@@ -2,6 +2,7 @@
 const VERSION = "__VERSION__";
 const SHELL = `thv-shell-${VERSION}`;
 const TILES = "thv-tiles-v1";      // basemap tiles (also filled by "ดาวน์โหลดแผนที่ออฟไลน์")
+const LIB = "thv-lib-v1";         // on-demand libraries (pdf.js for NOTAM import)
 const DATA = "thv-data-v1";        // last good API responses (METAR, forecast, elevation...)
 const MAX_TILES = 8000;           // CORS tiles (Esri, CARTO, OSM, OpenTopoMap, GIBS)
 const MAX_OPAQUE = 600;           // no-CORS tiles (Google) are counted heavily against quota — keep few
@@ -79,7 +80,11 @@ async function shellStrategy(e) {
     }
   }
   const hit = await caches.match(req, { ignoreSearch: true });
-  return hit || fetch(req);
+  if (hit) return hit;
+  const res = await fetch(req);
+  // large on-demand libraries (pdf.js) are kept in a cache that survives app updates
+  if (res.ok && new URL(req.url).pathname.includes("/vendor/pdfjs/")) (await caches.open(LIB)).put(req, res.clone());
+  return res;
 }
 
 self.addEventListener("fetch", e => {

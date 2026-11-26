@@ -333,7 +333,7 @@ function idbOpen() { return new Promise((res, rej) => { if (!window.indexedDB) r
 async function idbSet(k, v) { try { const db = await idbOpen(); db.transaction("kv", "readwrite").objectStore("kv").put(v, k); } catch (_) {} }
 async function idbGet(k) { try { const db = await idbOpen(); return await new Promise(res => { const q = db.transaction("kv").objectStore("kv").get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(null); }); } catch (_) { return null; } }
 
-const K = { set:"thv2_settings", route:"thv2_route", routes:"thai_heli_vfr_saved_routes_v1", wps:"thai_heli_vfr_saved_waypoints_v1", notams:"thv2_custom_notams", check:"thv2_checklist", pad:"thv2_pad", fly:"thv2_fly", layers:"thv3_layers", oaip:"thv3_oaip_key" };
+const K = { set:"thv2_settings", route:"thv2_route", routes:"thai_heli_vfr_saved_routes_v1", wps:"thai_heli_vfr_saved_waypoints_v1", notams:"thv2_custom_notams", check:"thv2_checklist", pad:"thv2_pad", fly:"thv2_fly", layers:"thv3_layers", oaip:"thv3_oaip_key", jset:"thv4_notam_set" };
 
 const DEFAULT_S = { preset:"custom", tas:0, burn:0, alt:0, varW:0.5, wdir:0, wspd:0, etd:"", fob:0, cap:0, taxi:30, cont:10, res:20, extra:0, altn:"", bew:0, mtow:0, crew:380, pax:0, cargo:0, vismin:5, ceilmin:1000, coord:"DD", basemap:"sat" };
 const S = Object.assign({}, DEFAULT_S, LS.get(K.set, {}));
@@ -344,6 +344,7 @@ const state = {
   savedRoutes: LS.get(K.routes, []),
   cwps: LS.get(K.wps, []),
   customNotams: LS.get(K.notams, []),
+  notamSet: LS.get(K.jset, null),
   notams: [],
   weather: {}, metar: {}, taf: {},
   profile: null,
@@ -357,7 +358,7 @@ const state = {
 if (!Array.isArray(state.route)) state.route = [];
 state.notams = [];
 function notamExpired(n, now = new Date()) { const v = notamValidity(n); return !!(v && v.to < now); }
-function rebuildNotams() { const now = new Date(), all = [...state.customNotams, ...AEROTHAI_NOTAMS]; state.notams = all.filter(n => !notamExpired(n, now)); state.notamsExpired = all.length - state.notams.length; }
+function rebuildNotams() { const base = state.notamSet && Array.isArray(state.notamSet.list) ? state.notamSet.list : AEROTHAI_NOTAMS, now = new Date(), all = [...state.customNotams, ...base]; state.notams = all.filter(n => !notamExpired(n, now)); state.notamsExpired = all.length - state.notams.length; }
 
 function saveS() { LS.set(K.set, S); }
 function toast(msg) { const el = $("toast"); el.textContent = msg; el.classList.remove("hidden"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.add("hidden"), 2800); }
@@ -492,6 +493,7 @@ function notamGeom(n) {
   if (pts.length >= 2 && /EITHER\s+SIDE/i.test(n.body)) return { type: "line", pts, r: rm ? +rm[1] : 3, center: pts[Math.floor(pts.length / 2)] };
   if (pts.length >= 3) { const u = pts.slice(0, -1); const c = [u.reduce((s, p) => s + p[0], 0) / u.length, u.reduce((s, p) => s + p[1], 0) / u.length]; return { type: "poly", pts, center: c }; }
   let c = pts[0];
+  if (!c && n.geo) return { type: "circle", center: [n.geo.lat, n.geo.lon], r: rm ? +rm[1] : n.geo.r };
   if (!c) { const ap = AIRPORTS.find(a => a.icao === n.icao); if (ap) c = [ap.lat, ap.lon]; }
   if (!c) return null;
   return { type: "circle", center: c, r: rm ? +rm[1] : 3 };
@@ -1706,7 +1708,120 @@ function handleLaunchParams() {
 }
 document.addEventListener("visibilitychange", () => { if (state.fly.on && document.visibilityState === "visible") setWake(true); });
 
-rebuildNotams();
+// =========================================================================
+// 18. NOTAM IMPORT — AEROTHAI Series J list (PDF or pasted text)
+// =========================================================================
+const NOTAM_CAT_TH = { "UAV/DRONE": "UAV", PJE: "กระโดดร่ม (PJE)", RESTRICTED: "พื้นที่หวงห้ามชั่วคราว", "MIL/FIRING": "ฝึก/ยิงอาวุธ", "OPS/EVENT": "" };
+let notamImportBuf = null;
+const NOTAM_ID_RE = /\b([A-Z]\d{4}\/\d{2})\b/g;
+const altFt = s => { if (!s) return null; const t = s.toUpperCase(); let m = t.match(/FL\s*(\d{2,3})/); if (m) return +m[1] * 100; m = t.match(/(\d[\d,]*)\s*(?:FT|FEET)/); if (m) return +m[1].replace(/,/g, ""); if (/\b(GND|SFC)\b/.test(t)) return 0; if (/UNL/.test(t)) return 99999; return null; };
+const fmtAlt = s => { if (!s) return ""; const t = s.toUpperCase().replace(/\s+/g, " ").trim(); const m = t.match(/^(\d[\d,]*)\s*(?:FT|FEET)\s*(AMSL|AGL|MSL)?/); return m ? `${fmt(+m[1].replace(/,/g, ""))} FT${m[2] ? " " + (m[2] === "MSL" ? "AMSL" : m[2]) : ""}` : t.replace(/^SFC$/, "GND"); };
+function notamCategory(q, text) {
+  const s = (q || "").slice(1, 3), t = text.toUpperCase();
+  if (/UAV|UNMANNED|DRONE|RPAS/.test(t) || s === "WU") return "UAV/DRONE";
+  if (/\bPJE\b|PARACHUT/.test(t) || s === "WP") return "PJE";
+  if (/FIRING|\bGUN|MISSILE|ROCKET|EXPLOSI|BOMB|MIL(ITARY)? EXER|LIVE FIRE/.test(t) || s === "WM") return "MIL/FIRING";
+  if (/RESTRICTED|PROHIBITED|DANGER AREA/.test(t) || /^R[TRPD]$/.test(s)) return "RESTRICTED";
+  return "OPS/EVENT";
+}
+function parseNotamText(raw) {
+  const text = String(raw || "").replace(/\r/g, "").split("\n")
+    .map(l => l.replace(/Page \d+ of \d+/i, "").replace(/THAILAND INTERNATIONAL NOTAM OFFICE/i, ""))
+    .filter(l => !/NOTAM LIST|(still|were still) valid on/i.test(l))
+    .join("\n").replace(/[ \t ]+/g, " ");
+  const starts = []; let m; NOTAM_ID_RE.lastIndex = 0;
+  while ((m = NOTAM_ID_RE.exec(text))) { if (/NOTAM[RC]\s*$/.test(text.slice(Math.max(0, m.index - 10), m.index))) continue; starts.push(m.index); }
+  const out = [], cancelled = new Set(), seen = new Set();
+  starts.forEach((st, i) => {
+    const seg = text.slice(st, starts[i + 1] ?? text.length).trim(), id = seg.match(/^[A-Z]\d{4}\/\d{2}/)[0], flat = seg.replace(/\s*\n\s*/g, " ");
+    if (seen.has(id)) return; seen.add(id);
+    const c = flat.match(/NOTAMC\s+([A-Z]\d{4}\/\d{2})/); if (c) { cancelled.add(c[1]); return; }
+    const q = flat.match(/Q\)\s*([A-Z]{4})\/(Q[A-Z]{4})\/[^/]*\/[^/]*\/[^/]*\/(\d{3})\/(\d{3})\/(\d{2})(\d{2})([NS])(\d{3})(\d{2})([EW])(\d{3})/);
+    const a = flat.match(/\bA\)\s*([A-Z]{4})/), b = flat.match(/\bB\)\s*(\d{10})/), cc = flat.match(/\bC\)\s*(\d{10}|PERM)/);
+    let from = b && b[1], to = cc && cc[1];
+    if (!from) { const v = flat.match(/(\d{10})\s*(?:\/|-|–|TO)\s*(\d{10}|PERM)/); if (v) { from = v[1]; to = v[2]; } }
+    const field = k => { const r = flat.match(new RegExp(`\\b${k}\\)\\s*(.*?)(?=\\s[A-G]\\)\\s|$)`)); return r ? r[1].trim() : ""; };
+    let e = field("E"); const d = field("D"), f = field("F"), g = field("G");
+    if (!e) e = flat.replace(/^[A-Z]\d{4}\/\d{2}\s*(NOTAM[NR]\s*([A-Z]\d{4}\/\d{2})?)?/, "").replace(/(\d{10})\s*(?:\/|-|–|TO)\s*(\d{10}|PERM)(\s*EST)?/, "").replace(/\bVT[A-Z]{2}\b\s*/, "").trim();
+    if (!e && !q) return;
+    const icao = (a && a[1]) || (flat.match(/\b(VT[A-Z]{2})\b/) || [])[1] || (q && q[1]) || "VTBB";
+    const category = notamCategory(q && q[2], e);
+    const rm = e.match(/RADIUS\s+(\d+(?:\.\d+)?)\s*NM/i), radius = rm ? +rm[1] : q ? +q[11] : null;
+    const lim2 = !f && !g ? e.match(/\b(GND|SFC|\d[\d,]*\s*FT(?:\s*(?:AMSL|AGL|MSL))?)\s*(?:-|–|TO)\s*(\d[\d,]*\s*FT(?:\s*(?:AMSL|AGL|MSL))?|FL\s*\d{2,3}|UNL)/) : null;
+    const lower = f || (lim2 && lim2[1]) || (q ? (+q[3] ? `FL${q[3]}` : "GND") : ""), upper = g || (lim2 && lim2[2]) || (q && +q[4] && +q[4] < 999 ? `FL${q[4]}` : "");
+    const up = altFt(upper);
+    const severity = category === "RESTRICTED" || category === "MIL/FIRING" || category === "PJE" ? "critical" : category === "UAV/DRONE" ? (up == null || up > 1000 ? "critical" : up > 200 ? "caution" : "info") : "caution";
+    const place = (e.match(/\(([A-Z][A-Z .'-]{3,60}(?:PROVINCE|DISTRICT|AREA))\)/) || [])[1];
+    const what = NOTAM_CAT_TH[category] || e.split(/\s+/).slice(0, 5).join(" ");
+    const lim = lower || upper ? ` (${fmtAlt(lower) || "GND"} - ${fmtAlt(upper) || "?"})` : "";
+    const isPoly = parseNotamCoords(e).length >= 3;
+    const title = `${what} ${place ? place.toLowerCase().replace(/\b\w/g, x => x.toUpperCase()) : icao}${isPoly ? " — พื้นที่กำหนด" : radius ? ` — รัศมี ${radius} NM` : ""}${lim}`;
+    const body = `${e.toUpperCase()}${d ? ` SCHEDULE: ${d}.` : ""}${lower || upper ? ` LOWER: ${lower || "-"} / UPPER: ${upper || "-"}.` : ""}`;
+    const n = { id, series: `Series ${id[0]}`, icao, category, severity, title, body, valid: from ? `${from} - ${to || "PERM"}` : "PERM", imported: true };
+    if (q) { let la = +q[5] + q[6] / 60, lo = +q[8] + q[9] / 60; if (q[7] === "S") la = -la; if (q[10] === "W") lo = -lo; n.geo = { lat: la, lon: lo, r: +q[11] || 1 }; }
+    out.push(n);
+  });
+  return { list: out, cancelled: [...cancelled] };
+}
+async function pdfToText(file) {
+  const pdfjs = await import(new URL("vendor/pdfjs/pdf.min.mjs", document.baseURI).href);
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL("vendor/pdfjs/pdf.worker.min.mjs", document.baseURI).href;
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise; let txt = "";
+  for (let i = 1; i <= doc.numPages; i++) {
+    const c = await (await doc.getPage(i)).getTextContent(); let lastY = null;
+    for (const it of c.items) { const y = it.transform ? it.transform[5] : null; if (lastY != null && y != null && Math.abs(y - lastY) > 2) txt += "\n"; else if (txt && !/\s$/.test(txt)) txt += " "; txt += it.str; if (it.hasEOL) txt += "\n"; lastY = y; }
+    txt += "\n";
+  }
+  return txt;
+}
+function notamSetLabel() {
+  const js = state.notamSet;
+  $("notam-set-date").textContent = js ? `นำเข้า ${new Date(js.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Bangkok" }).toUpperCase()} • ${js.list.length} รายการ` : "ชุดข้อมูล: 1 NOV 2026 (มากับแอป)";
+  $("btn-notam-reset").classList.toggle("hidden", !js);
+}
+function previewNotamImport(res, src) {
+  notamImportBuf = { ...res, src };
+  const now = new Date(), act = res.list.filter(n => !notamExpired(n, now)), noGeo = res.list.filter(n => !parseNotamCoords(n.body).length && !n.geo);
+  $("notam-import-status").innerHTML = res.list.length
+    ? `<span class="text-emerald-300">พบ ${res.list.length} รายการ</span> • มีผลอยู่ ${act.length} • หมดอายุ ${res.list.length - act.length} (จะถูกซ่อน)${noGeo.length ? ` • <span class="text-amber-300">ไม่พบพิกัด ${noGeo.length} (ใช้ตำแหน่งสนามบิน)</span>` : ""}${res.cancelled.length ? ` • ยกเลิก ${res.cancelled.length}` : ""}`
+    : `<span class="text-rose-300">ไม่พบ NOTAM ในข้อมูลนี้ — ตรวจว่าเป็นไฟล์/ข้อความรายการ NOTAM (เช่น J7261/26 ...)</span>`;
+  const st = { critical: "pill-stop", caution: "pill-warn", info: "pill-info" };
+  $("notam-import-preview").innerHTML = res.list.map(n => `<div class="rounded-lg px-2 py-1.5 text-[11.5px] ${notamExpired(n, now) ? "opacity-40" : ""}" style="background:rgba(2,6,15,.5);border:1px solid var(--line)"><div class="flex items-center gap-1.5"><b class="mono">${esc(n.id)}</b><span class="mono text-slate-400">${esc(n.icao)}</span><span class="pill ${st[n.severity]}">${esc(n.category)}</span>${parseNotamCoords(n.body).length || n.geo ? "" : `<span class="pill pill-warn">ไม่มีพิกัด</span>`}${notamExpired(n, now) ? `<span class="pill pill-info">หมดอายุ</span>` : ""}</div><div class="text-slate-200 truncate">${esc(n.title)}</div><div class="mono text-[10.5px] text-slate-500">${esc(n.valid)}</div></div>`).join("");
+  $("notam-import-actions").classList.toggle("hidden", !res.list.length);
+}
+$("btn-open-notam-import").onclick = () => { $("notam-import").classList.toggle("hidden"); $("notam-form").classList.add("hidden"); notamSetLabel(); lucide.createIcons(); };
+$("btn-close-notam-import").onclick = () => $("notam-import").classList.add("hidden");
+$("btn-notam-pick").onclick = () => $("file-notam").click();
+$("btn-notam-parse").onclick = () => { const t = $("notam-paste").value; if (!t.trim()) return toast("วางข้อความ NOTAM ก่อน"); previewNotamImport(parseNotamText(t), "ข้อความที่วาง"); };
+$("file-notam").onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  $("notam-import-status").textContent = `กำลังอ่าน ${f.name}...`; $("notam-import-preview").innerHTML = ""; $("notam-import-actions").classList.add("hidden");
+  try {
+    const isPdf = /pdf$/i.test(f.type) || /\.pdf$/i.test(f.name);
+    const txt = isPdf ? await pdfToText(f) : await f.text();
+    $("notam-paste").value = txt.slice(0, 200000);
+    previewNotamImport(parseNotamText(txt), f.name);
+  } catch (err) { $("notam-import-status").innerHTML = `<span class="text-rose-300">อ่านไฟล์ไม่สำเร็จ: ${esc(err.message || err)}${!navigator.onLine ? " — การอ่าน PDF ครั้งแรกต้องใช้อินเทอร์เน็ต (หรือคัดลอกข้อความมาวางแทน)" : ""}</span>`; }
+};
+$("btn-notam-commit").onclick = () => {
+  const buf = notamImportBuf; if (!buf || !buf.list.length) return;
+  const mode = document.querySelector('input[name="nimode"]:checked').value;
+  let list = buf.list;
+  if (mode === "merge") { const ids = new Set(list.map(n => n.id)); list = [...list, ...(state.notamSet ? state.notamSet.list : AEROTHAI_NOTAMS).filter(n => !ids.has(n.id))]; }
+  const cx = new Set(buf.cancelled); list = list.filter(n => !cx.has(n.id));
+  state.notamSet = { date: new Date().toISOString(), source: buf.src, list };
+  LS.set(K.jset, state.notamSet); rebuildNotams(); renderNotams(); renderMapMarkers(); renderBrief(); notamSetLabel();
+  $("notam-import-preview").innerHTML = ""; $("notam-import-actions").classList.add("hidden"); $("notam-paste").value = ""; notamImportBuf = null;
+  $("notam-import-status").innerHTML = `<span class="text-emerald-300">นำเข้าแล้ว ${list.length} รายการ — แสดงที่มีผลอยู่ ${state.notams.length - state.customNotams.filter(n => !notamExpired(n)).length} รายการ</span>`;
+  toast(`อัปเดต NOTAM แล้ว (${list.length} รายการ)`);
+};
+$("btn-notam-reset").onclick = () => {
+  if (!confirm("ลบชุด NOTAM ที่นำเข้า และกลับไปใช้ชุดที่มากับแอป (1 NOV 2026)?")) return;
+  state.notamSet = null; try { localStorage.removeItem(K.jset); } catch (_) {} idbSet(K.jset, null);
+  rebuildNotams(); renderNotams(); renderMapMarkers(); renderBrief(); notamSetLabel(); toast("กลับไปใช้ชุด NOTAM ที่มากับแอปแล้ว");
+};
+
+rebuildNotams(); notamSetLabel();
 setInterval(() => { const n = state.notams.length; rebuildNotams(); if (n !== state.notams.length) { renderNotams(); renderMapMarkers(); renderBrief(); } }, 30 * 60e3);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && navigator.onLine && (!state.metarAt || Date.now() - state.metarAt > 5 * 60e3)) { loadMetar(); loadRadar(); } });
 (async function boot() {

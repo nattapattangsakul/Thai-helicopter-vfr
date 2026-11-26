@@ -24,6 +24,9 @@ copy(path.join(NM, "leaflet/dist/leaflet.js"), r("vendor/leaflet/leaflet.js"));
 copy(path.join(NM, "leaflet/dist/leaflet.css"), r("vendor/leaflet/leaflet.css"));
 for (const f of fs.readdirSync(path.join(NM, "leaflet/dist/images"))) copy(path.join(NM, "leaflet/dist/images", f), r("vendor/leaflet/images", f));
 copy(path.join(NM, "lucide/dist/umd/lucide.min.js"), r("vendor/lucide.min.js"));
+// pdf.js (legacy build for older iOS Safari) — loaded on demand by "นำเข้า NOTAM", cached at runtime, not precached
+copy(path.join(NM, "pdfjs-dist/legacy/build/pdf.min.mjs"), r("vendor/pdfjs/pdf.min.mjs"));
+copy(path.join(NM, "pdfjs-dist/legacy/build/pdf.worker.min.mjs"), r("vendor/pdfjs/pdf.worker.min.mjs"));
 log("vendor copied");
 
 // ---------- 2. self-hosted fonts ----------
@@ -79,7 +82,7 @@ if (needIcons) {
 const walk = d => fs.readdirSync(r(d), { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 const PRECACHE = [
   "index.html", "manifest.webmanifest", "css/app.css", "css/fonts.css", "js/app.js",
-  ...walk("vendor"), ...walk("fonts"), ...walk("icons").filter(f => /\.(png|svg)$/.test(f) && !f.includes("screenshot"))
+  ...walk("vendor").filter(f => !f.includes("pdfjs")), ...walk("fonts"), ...walk("icons").filter(f => /\.(png|svg)$/.test(f) && !f.includes("screenshot"))
 ].map(f => f.split(path.sep).join("/")).filter(f => !f.endsWith(".map"));
 const hash = createHash("sha256");
 for (const f of PRECACHE) {
