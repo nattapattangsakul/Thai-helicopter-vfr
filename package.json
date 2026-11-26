@@ -13,6 +13,7 @@
     "@fontsource/ibm-plex-sans-thai": "^5.1.0",
     "leaflet": "1.9.4",
     "lucide": "0.460.0",
+    "pdfjs-dist": "4.10.38",
     "tailwindcss": "3.4.17"
   }
 }
