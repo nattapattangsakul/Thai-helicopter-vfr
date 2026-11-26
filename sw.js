@@ -1,5 +1,5 @@
 /* THAI HELI-VFR EFB — service worker (generated from scripts/sw.template.js by `npm run build`) */
-const VERSION = "d56aed710f";
+const VERSION = "1bb015f283";
 const SHELL = `thv-shell-${VERSION}`;
 const TILES = "thv-tiles-v1";      // basemap tiles (also filled by "ดาวน์โหลดแผนที่ออฟไลน์")
 const LIB = "thv-lib-v1";         // on-demand libraries (pdf.js for NOTAM import)
@@ -11,8 +11,8 @@ const PRECACHE = [
   "./index.html",
   "./manifest.webmanifest",
   "./css/fonts.css",
-  "./assets/app.f493244104.css",
-  "./assets/app.af2db323e1.js",
+  "./assets/app.0134cf643a.css",
+  "./assets/app.987845612a.js",
   "./vendor/leaflet/images/layers-2x.png",
   "./vendor/leaflet/images/layers.png",
   "./vendor/leaflet/images/marker-icon-2x.png",
@@ -44,7 +44,7 @@ const PRECACHE = [
 ];
 
 const TILE_HOSTS = /(^|\.)(mt\d\.google\.com|server\.arcgisonline\.com|basemaps\.cartocdn\.com|tile\.opentopomap\.org|tile\.openstreetmap\.org|gibs\.earthdata\.nasa\.gov|api\.tiles\.openaip\.net)$/;
-const DATA_HOSTS = /(^|\.)(api\.open-meteo\.com|aviationweather\.gov|api\.rainviewer\.com)$/;
+const DATA_HOSTS = /(^|\.)(api\.open-meteo\.com|aviationweather\.gov|metar\.vatsim\.net|api\.rainviewer\.com)$/;
 const NO_CACHE_HOSTS = /(^|\.)(tilecache\.rainviewer\.com)$/;
 
 self.addEventListener("install", e => {

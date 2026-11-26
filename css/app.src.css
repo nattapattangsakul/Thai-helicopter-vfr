@@ -97,12 +97,17 @@
   #side-drawer.dragging { transition:none; }
   .ui-right { right:12px; }
   #hud { bottom:calc(var(--sheet-h) + 10px); }
+  /* keep every rail button reachable above the bottom sheet (scrolls when space is short) */
+  #tool-rail { max-height:calc(100vh - var(--sheet-h) - 150px - env(safe-area-inset-top)); }
+  @supports (height:100dvh) { #tool-rail { max-height:calc(100dvh - var(--sheet-h) - 150px - env(safe-area-inset-top)); } }
+  #tool-rail > * { flex:none; }
   .leaflet-bottom { bottom:var(--sheet-h); }
   @media (min-width:1024px) {
     #side-drawer { left:auto; right:12px; top:12px; bottom:12px; width:440px; height:auto; border-radius:22px; border-bottom:1px solid var(--line); padding-bottom:0; }
     body.panel-collapsed #side-drawer { transform:translateX(calc(100% + 28px)); }
     body:not(.panel-collapsed) .ui-right { right:464px; }
     #hud { bottom:12px; }
+    #tool-rail { max-height:calc(100vh - 140px); }
     .leaflet-bottom { bottom:0; }
     body:not(.panel-collapsed) .leaflet-bottom.leaflet-right { right:452px; }
     #sheet-handle { display:none; }
