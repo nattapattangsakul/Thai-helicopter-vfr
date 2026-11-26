@@ -1007,7 +1007,10 @@ function mapPad() {
   return { paddingTopLeft: [64, top], paddingBottomRight: [right, sheet + 24] };
 }
 function fitRoute() { if (state.route.length >= 2) map.fitBounds(L.latLngBounds(state.route.map(w => [w.lat, w.lon])), mapPad()); else if (state.route[0]) map.flyTo([state.route[0].lat, state.route[0].lon], 10); }
-$("btn-fit-route").onclick = fitRoute;
+$("btn-fit-route").onclick = () => {
+  if (state.route.length) { fitRoute(); toast(state.route.length >= 2 ? `ซูมพอดีเส้นทาง ${state.route[0].id} → ${state.route[state.route.length - 1].id}` : `ไปที่ ${state.route[0].id}`); }
+  else { map.fitBounds([[5.6, 97.3], [20.5, 105.7]], mapPad()); toast("ยังไม่มีเส้นทาง — แสดงภาพรวมประเทศไทย"); }
+};
 
 // =========================================================================
 // 10. SETTINGS BINDING
