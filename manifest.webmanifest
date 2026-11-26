@@ -1,0 +1,33 @@
+{
+  "id": "./",
+  "name": "THAI HELI-VFR EFB",
+  "short_name": "HELI-VFR",
+  "description": "Electronic Flight Bag สำหรับวางแผนและบิน VFR เฮลิคอปเตอร์ในประเทศไทย — Navlog แก้ลม, น้ำมัน/น้ำหนัก, NOTAM, METAR/TAF, เรดาร์ฝน, สิ่งกีดขวาง, ADS-B และโหมดบิน GPS",
+  "lang": "th",
+  "dir": "ltr",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "fullscreen"],
+  "orientation": "any",
+  "background_color": "#060a13",
+  "theme_color": "#060a13",
+  "categories": ["navigation", "travel", "utilities", "weather"],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "screenshots": [
+    { "src": "icons/screenshot-wide.png", "sizes": "1280x800", "type": "image/png", "form_factor": "wide", "label": "วางแผนเส้นทางบนแผนที่ดาวเทียม พร้อม Navlog" },
+    { "src": "icons/screenshot-narrow.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow", "label": "แผนบินบนสมาร์ทโฟน" }
+  ],
+  "shortcuts": [
+    { "name": "โหมดบิน", "short_name": "FLY", "url": "./?action=fly", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "บรีฟฟิ่ง Go/No-Go", "short_name": "Brief", "url": "./?tab=brief", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "อากาศ METAR/TAF", "short_name": "Weather", "url": "./?tab=weather", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
