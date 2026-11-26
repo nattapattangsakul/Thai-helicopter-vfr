@@ -78,10 +78,25 @@ if (needIcons) {
   }
 }
 
-// ---------- 5. service worker precache list + version ----------
+// ---------- 5. content-hashed copies of app.js / app.css ----------
+// Each build gets new file names, so a page can never pair a new index.html with an old
+// app.js still sitting in a previous service worker's cache (that mismatch froze the app).
+fs.rmSync(r("assets"), { recursive: true, force: true }); mkdir(r("assets"));
+const hashed = {};
+for (const [src, ext] of [["js/app.js", "js"], ["css/app.css", "css"]]) {
+  const buf = fs.readFileSync(r(src)), h = createHash("sha256").update(buf).digest("hex").slice(0, 10);
+  hashed[src] = `assets/app.${h}.${ext}`; fs.writeFileSync(r(hashed[src]), buf);
+}
+let html = fs.readFileSync(r("index.html"), "utf8")
+  .replace(/\.\/(?:css\/app\.css|assets\/app\.[0-9a-f]+\.css)/, "./" + hashed["css/app.css"])
+  .replace(/\.\/(?:js\/app\.js|assets\/app\.[0-9a-f]+\.js)/, "./" + hashed["js/app.js"]);
+fs.writeFileSync(r("index.html"), html);
+log("assets:", Object.values(hashed).join(", "));
+
+// ---------- 6. service worker precache list + version ----------
 const walk = d => fs.readdirSync(r(d), { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 const PRECACHE = [
-  "index.html", "manifest.webmanifest", "css/app.css", "css/fonts.css", "js/app.js",
+  "index.html", "manifest.webmanifest", "css/fonts.css", hashed["css/app.css"], hashed["js/app.js"],
   ...walk("vendor").filter(f => !f.includes("pdfjs")), ...walk("fonts"), ...walk("icons").filter(f => /\.(png|svg)$/.test(f) && !f.includes("screenshot"))
 ].map(f => f.split(path.sep).join("/")).filter(f => !f.endsWith(".map"));
 const hash = createHash("sha256");

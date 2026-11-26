@@ -1559,7 +1559,12 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http") && !/cl
     reg.addEventListener("updatefound", () => { const w = reg.installing; w && w.addEventListener("statechange", () => { if (w.state === "installed" && navigator.serviceWorker.controller) showUpdate(w); }); });
     setInterval(() => reg.update().catch(() => {}), 60 * 60e3);
   }).catch(() => {});
-  navigator.serviceWorker.addEventListener("controllerchange", () => { if (reloading || !navigator.serviceWorker.controller) return; reloading = true; if (!state.fly.on) location.reload(); });
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloading || !hadController) return; reloading = true;
+    if (state.fly.on) { $("update-banner").classList.remove("hidden"); $("btn-update-now").onclick = () => location.reload(); }
+    else location.reload();
+  });
 }
 $("btn-check-update").onclick = async () => {
   if (!swReg) return toast("เปิดผ่าน https เพื่อใช้การอัปเดตอัตโนมัติ");

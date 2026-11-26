@@ -27,6 +27,6 @@ npm install
 npm run build   # สร้าง css/app.css, vendor/, fonts/, icons/, sw.js (ต้อง build ใหม่ทุกครั้งที่แก้โค้ด เพื่ออัปเดตเวอร์ชัน service worker)
 npm run serve   # http://localhost:8080
 ```
-โครงสร้าง: `index.html` (UI), `js/app.js` (ตรรกะทั้งหมด), `css/app.src.css` (Tailwind source), `scripts/sw.template.js` (service worker), `scripts/build.mjs`
+โครงสร้าง: `index.html` (UI), `js/app.js` (ตรรกะทั้งหมด — build จะสร้างสำเนาชื่อตาม hash ใน `assets/`), `css/app.src.css` (Tailwind source), `scripts/sw.template.js` (service worker), `scripts/build.mjs`
 
 > ⚠️ ใช้ประกอบการวางแผนเท่านั้น ไม่ใช่แหล่งข้อมูลการบินอย่างเป็นทางการ ตรวจสอบกับ AIP Thailand, NOTAM, ข้อมูลอุตุนิยมวิทยา และ RFM ทุกครั้ง

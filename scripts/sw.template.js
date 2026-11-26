@@ -13,7 +13,8 @@ const DATA_HOSTS = /(^|\.)(api\.open-meteo\.com|aviationweather\.gov|api\.rainvi
 const NO_CACHE_HOSTS = /(^|\.)(tilecache\.rainviewer\.com)$/;
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(SHELL).then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: "reload" })))));
+  // activate as soon as the new shell is cached — the page reloads itself on controllerchange
+  e.waitUntil(caches.open(SHELL).then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", e => {
