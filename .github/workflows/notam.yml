@@ -1,0 +1,40 @@
+name: Update NOTAM
+
+# Fetches AEROTHAI's "NOTAM LIST SERIES J" PDF, parses it into data/notam-j.json and commits it
+# when it changed. The site deploy (pages.yml) runs after this workflow, so the app's
+# "อัปเดต NOTAM" button picks up the new list.
+on:
+  schedule:
+    - cron: "17 22 * * *"    # daily 05:17 ICT
+    - cron: "47 10 * * *"    # daily 17:47 ICT
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: notam
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Fetch and parse Series J
+        run: node scripts/fetch-notam.mjs
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- data/notam-j.json && ! git ls-files --others --exclude-standard data | grep -q .; then
+            echo "No change"; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/notam-j.json
+          git commit -m "Update NOTAM Series J ($(node -p "require('./data/notam-j.json').listDate"))"
+          git push

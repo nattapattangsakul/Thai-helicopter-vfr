@@ -166,6 +166,17 @@
   .fwp { font:700 11px 'IBM Plex Mono',monospace; color:#fde68a; background:rgba(6,10,19,.85); border:1px solid #b45309; border-radius:6px; padding:0 5px; white-space:nowrap; }
   .fwp.tgt { color:#fff; background:#a21caf; border-color:#f0abfc; }
 }
+  /* sign-in / app lock */
+  #lock-screen { display:none; }
+  html.locked #lock-screen { display:flex; }
+  html.locked #app, html.locked #fly-overlay, html.locked #app-modal { visibility:hidden; }
+  .lk { height:64px; border-radius:20px; font:600 24px 'IBM Plex Mono',monospace; color:#f1f5f9; background:rgba(255,255,255,.07); border:1px solid rgba(148,163,184,.2); display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; transition:transform .08s, background .15s; }
+  .lk:active { transform:scale(.94); background:rgba(245,165,36,.25); }
+  .lk-fn { background:transparent; border-color:transparent; color:#94a3b8; }
+  #lock-dots span { width:13px; height:13px; border-radius:99px; border:2px solid #94a3b8; }
+  #lock-dots span.on { background:#fbbf24; border-color:#fbbf24; }
+  @keyframes lk-shake { 0%,100% { transform:translateX(0) } 20%,60% { transform:translateX(-10px) } 40%,80% { transform:translateX(10px) } }
+  .lk-shake { animation:lk-shake .35s; }
   .ac-ic { transition:transform .6s linear; }
   body.night-dim #fly-overlay { filter:brightness(.55) sepia(.35) hue-rotate(-25deg); }
   @keyframes pulse-r { 0%,100% { box-shadow:0 0 0 0 rgba(239,68,68,.7);} 50% { box-shadow:0 0 0 8px rgba(239,68,68,0);} }

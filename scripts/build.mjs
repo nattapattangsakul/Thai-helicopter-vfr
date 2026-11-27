@@ -87,7 +87,8 @@ if (needIcons) {
 fs.rmSync(r("assets"), { recursive: true, force: true }); mkdir(r("assets"));
 const hashed = {};
 for (const [src, ext] of [["js/app.js", "js"], ["css/app.css", "css"]]) {
-  const buf = fs.readFileSync(r(src)), h = createHash("sha256").update(buf).digest("hex").slice(0, 10);
+  // the app bundle = shared NOTAM parser + app code
+  const buf = src === "js/app.js" ? Buffer.concat([fs.readFileSync(r("js/notam-parser.js")), Buffer.from("\n"), fs.readFileSync(r(src))]) : fs.readFileSync(r(src)), h = createHash("sha256").update(buf).digest("hex").slice(0, 10);
   hashed[src] = `assets/app.${h}.${ext}`; fs.writeFileSync(r(hashed[src]), buf);
 }
 let html = fs.readFileSync(r("index.html"), "utf8")

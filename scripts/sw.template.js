@@ -92,6 +92,7 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  if (url.origin === self.location.origin && url.pathname.includes("/data/")) return e.respondWith(dataStrategy(req));   // NOTAM list etc.: network first
   if (url.origin === self.location.origin) return e.respondWith(shellStrategy(e));
   if (NO_CACHE_HOSTS.test(url.hostname)) return;
   if (TILE_HOSTS.test(url.hostname)) return e.respondWith(tileStrategy(req));

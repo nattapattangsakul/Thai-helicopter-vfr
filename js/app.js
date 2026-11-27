@@ -96,6 +96,17 @@ function navaidRows(ap, cls = "text-[12px]") {
   return rows.length ? `<div class="space-y-0.5">${rows.join("")}</div>${ap.ils.length ? `<div class="text-[10px] text-slate-500">ข้อมูล ILS ตรวจกับ AIP/AIRAC ปัจจุบันก่อนใช้</div>` : ""}` : "";
 }
 
+// Full names for ATS frequency abbreviations (shown instead of bare codes such as SMC / CDC)
+const ATC_NAMES = {
+  ATIS: ["ATIS", "ข่าวสารสนามบินอัตโนมัติ"], CDC: ["Clearance Delivery", "ขออนุญาตเส้นทางบิน"], DEL: ["Clearance Delivery", "ขออนุญาตเส้นทางบิน"],
+  SMC: ["Ground (Surface Movement Control)", "ควบคุมการเคลื่อนที่ภาคพื้น"], GND: ["Ground", "ควบคุมภาคพื้น"], TWR: ["Tower", "หอบังคับการบิน"],
+  APP: ["Approach", "ควบคุมการบินเขตประชิดสนามบิน"], ARR: ["Arrival", "ควบคุมขาเข้า"], DEP: ["Departure", "ควบคุมขาออก"],
+  DAR: ["Arrival Radar", "ควบคุมขาเข้า (เรดาร์)"], INFO: ["Information", "ให้ข่าวสารการบิน"], AFIS: ["Flight Information (AFIS)", "บริการข่าวสารการบินสนามบิน"]
+};
+const atcName = k => (ATC_NAMES[k] || [k, ""])[0];
+const atcTh = k => (ATC_NAMES[k] || ["", ""])[1];
+const atcVal = v => esc(v).replace(/\bATZ\b/g, "ATZ (เขตจราจรสนามบิน)").replace(/\bCTR\b/g, "CTR (เขตควบคุม)");
+
 const VOR_STATIONS = [
   ["BKK","BANGKOK","117.7","CH124X","H24",13.893611,100.596111,100,"VTBD"],
   ["SVB","SUVARNABHUMI","111.4","CH51X","H24",13.659028,100.731444,5,"VTBS"],
@@ -342,7 +353,7 @@ function idbOpen() { return new Promise((res, rej) => { if (!window.indexedDB) r
 async function idbSet(k, v) { try { const db = await idbOpen(); db.transaction("kv", "readwrite").objectStore("kv").put(v, k); } catch (_) {} }
 async function idbGet(k) { try { const db = await idbOpen(); return await new Promise(res => { const q = db.transaction("kv").objectStore("kv").get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(null); }); } catch (_) { return null; } }
 
-const K = { set:"thv2_settings", route:"thv2_route", routes:"thai_heli_vfr_saved_routes_v1", wps:"thai_heli_vfr_saved_waypoints_v1", notams:"thv2_custom_notams", check:"thv2_checklist", pad:"thv2_pad", fly:"thv2_fly", layers:"thv3_layers", oaip:"thv3_oaip_key", jset:"thv4_notam_set" };
+const K = { set:"thv2_settings", route:"thv2_route", routes:"thai_heli_vfr_saved_routes_v1", wps:"thai_heli_vfr_saved_waypoints_v1", notams:"thv2_custom_notams", check:"thv2_checklist", pad:"thv2_pad", fly:"thv2_fly", layers:"thv3_layers", oaip:"thv3_oaip_key", jset:"thv4_notam_set", jcheck:"thv5_notam_check", lock:"thv5_lock" };
 
 const DEFAULT_S = { preset:"custom", tas:0, burn:0, alt:0, varW:0.5, wdir:0, wspd:0, etd:"", fob:0, cap:0, taxi:30, cont:10, res:20, extra:0, altn:"", bew:0, mtow:0, crew:380, pax:0, cargo:0, vismin:5, ceilmin:1000, coord:"DD", basemap:"sat" };
 const S = Object.assign({}, DEFAULT_S, LS.get(K.set, {}));
@@ -470,7 +481,7 @@ function apPopup(ap) {
     <div class="mono text-[11px] text-cyan-300">${fmtLL(ap.lat, ap.lon)} • ELEV ${ap.elev} ft</div>
     ${mt ? `<div class="mono text-[11px] text-slate-200 bg-black/30 rounded-lg px-1.5 py-1">${esc(mt.raw)}</div>` : wx ? `<div class="mono text-[11px] text-slate-300">${pad3(wx.wdir)}/${wx.wspd}${wx.gust > wx.wspd + 5 ? "G" + wx.gust : ""}kt • VIS ${wx.vis.toFixed(1)}km • ${wx.temp}°C • Q${wx.qnh} <span class="text-slate-500">(โมเดล)</span></div>` : ""}
     <div class="text-[11px] text-slate-300">RWY: ${ap.runways.join(", ")}</div>
-    <div class="mono text-[10px] text-emerald-300 bg-black/30 rounded-lg px-1.5 py-1">${Object.entries(ap.atc).map(([k, v]) => `<span class="mr-1.5"><span class="text-slate-400">${k}</span> ${v}</span>`).join("")}</div>
+    <div class="mono text-[10px] text-emerald-300 bg-black/30 rounded-lg px-1.5 py-1">${Object.entries(ap.atc).map(([k, v]) => `<div class="flex justify-between gap-2"><span class="text-slate-400">${atcName(k)}</span><span class="text-right">${atcVal(v)}</span></div>`).join("")}</div>
     ${navaidRows(ap, "text-[11px]")}
     <div class="flex gap-1.5 pt-1"><button onclick="addKey('AP:${ap.icao}')" class="btn btn-sm btn-go flex-1">+ เส้นทาง</button><button onclick="inspectAirport('${ap.icao}')" class="btn btn-sm">รายละเอียด</button></div></div>`;
 }
@@ -876,7 +887,7 @@ function populateSelectors() {
   $("wp-datalist").innerHTML = dl.map(d => `<option value="${esc(d[0])}"></option>`).join("");
   const apOpts = AIRPORTS.map(a => `<option value="${a.icao}">${a.icao} — ${esc(a.nameTh)}</option>`).join("");
   $("s-altn").innerHTML = `<option value="">— ไม่มี —</option>` + apOpts; $("s-altn").value = S.altn || "";
-  if ($("nn-icao").options.length === 0) { $("nn-icao").innerHTML = `<option>VTBB</option>` + AIRPORTS.map(a => `<option>${a.icao}</option>`).join(""); AIRPORTS.forEach(a => $("notam-icao-filter").insertAdjacentHTML("beforeend", `<option value="${a.icao}">${a.icao}</option>`)); }
+  if (!populateSelectors._ap) { populateSelectors._ap = true; AIRPORTS.forEach(a => $("notam-icao-filter").insertAdjacentHTML("beforeend", `<option value="${a.icao}">${a.icao}</option>`)); }
   $("s-preset").innerHTML = Object.entries(HELI_PRESETS).map(([k, p]) => `<option value="${k}">${esc(p.name)}${p.tas ? ` — ${p.tas} kt / ${p.burn} lb/h` : ""}</option>`).join("");
   $("s-preset").value = S.preset in HELI_PRESETS ? S.preset : "custom";
 }
@@ -898,7 +909,7 @@ function showAirportDetail(icao) {
   c.innerHTML = `<div class="flex justify-between gap-2"><div><div class="text-[15px] font-bold text-emerald-300">${ap.icao} / ${ap.iata} — ${esc(ap.nameTh)}</div><div class="mono text-[11px] text-slate-400">${fmtLL(ap.lat, ap.lon)} • ELEV ${ap.elev} ft • ${esc(ap.type)}</div></div><button id="ap-close" class="btn btn-sm">✕</button></div>
     ${wxLine(ap, "WX")}
     <div class="text-[12px] text-slate-300"><b>RWY:</b> ${ap.runways.join(", ")} • <span class="mono">☀ ${ict(st.rise)}–${ict(st.set)}</span></div>
-    <div class="grid grid-cols-2 gap-1">${Object.entries(ap.atc).map(([k, v]) => `<div class="flex justify-between bg-[#070b14] border border-[#1c2638] rounded-lg px-2 py-1 mono text-[12px]"><span class="text-slate-400">${k}</span><span class="text-emerald-300 text-right">${v}</span></div>`).join("")}</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1">${Object.entries(ap.atc).map(([k, v]) => `<div class="flex justify-between bg-[#070b14] border border-[#1c2638] rounded-lg px-2 py-1 mono text-[12px]"><span class="text-slate-400 leading-tight">${atcName(k)}${atcTh(k) ? `<small class="block text-[10px] text-slate-500 font-sans">${atcTh(k)}</small>` : ""}</span><span class="text-emerald-300 text-right">${atcVal(v)}</span></div>`).join("")}</div>
     ${navaidRows(ap)}
     <div class="text-[12px] bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-xl p-2"><b>Heli note:</b> ${esc(ap.heliNote)}</div>
     <div class="flex gap-2"><button onclick="addKey('AP:${ap.icao}')" class="btn btn-go flex-1">+ เพิ่มในแผนบิน</button><button id="ap-fly" class="btn">โฟกัสแผนที่</button></div>`;
@@ -931,16 +942,6 @@ $("notams-list").addEventListener("click", e => {
   if (d) { state.customNotams = state.customNotams.filter(x => x.id !== d.dataset.ndel); LS.set(K.notams, state.customNotams); rebuildNotams(); renderNotams(); renderMapMarkers(); renderBrief(); }
 });
 ["notam-icao-filter", "notam-cat-filter"].forEach(id => $(id).addEventListener("change", renderNotams));
-$("btn-open-notam-form").onclick = () => $("notam-form").classList.toggle("hidden");
-$("btn-cancel-notam").onclick = () => $("notam-form").classList.add("hidden");
-$("notam-form").addEventListener("submit", e => {
-  e.preventDefault();
-  const n = { id: $("nn-id").value.trim() || `LOCAL-${Date.now() % 100000}`, series: "LOCAL", icao: $("nn-icao").value, category: $("nn-cat").value, severity: $("nn-sev").value, title: $("nn-title").value.trim(), body: $("nn-body").value.trim().toUpperCase(), valid: $("nn-valid").value.trim() || "PRE-FLIGHT NOTE" };
-  if (!n.title || !n.body) return;
-  state.customNotams.unshift(n); LS.set(K.notams, state.customNotams); rebuildNotams();
-  e.target.reset(); e.target.classList.add("hidden"); renderNotams(); renderMapMarkers(); renderBrief();
-  toast(notamGeom(n) && parseNotamCoords(n.body).length ? "เพิ่ม NOTAM และวาดบนแผนที่แล้ว" : "เพิ่ม NOTAM แล้ว (ไม่พบพิกัด — ใช้ตำแหน่งสนามบิน)");
-});
 
 // =========================================================================
 // 8. WEATHER (MODEL), WINDS ALOFT & RADAR
@@ -1132,20 +1133,44 @@ function onGps(pos) {
   if (lastFix && (gs == null || trk == null)) { const d = distNM(lastFix.lat, lastFix.lon, c.latitude, c.longitude), dt = (now - lastFix.t) / 3600e3; if (dt > 0 && d > .003) { if (gs == null) gs = d / dt; if (trk == null) trk = brgT(lastFix.lat, lastFix.lon, c.latitude, c.longitude); } }
   state.gps = { lat: c.latitude, lon: c.longitude, alt: c.altitude != null ? c.altitude * 3.28084 : null, gs: gs ?? 0, trk: trk ?? (state.gps?.trk ?? 0), acc: c.accuracy, t: now };
   lastFix = { lat: c.latitude, lon: c.longitude, t: now };
-  drawGps(); $("gps-btn-label").textContent = "GPS ON"; $("btn-my-gps").classList.add("on"); if (state.fly.on) { onFlyFix(); updateFly(); if (!state.fly.min) drawFlyDynamic(); }
+  onFlyFix(); drawGps(); if (state.fly.on) { updateFly(); if (!state.fly.min) drawFlyDynamic(); }
+}
+// Planning map as a moving map: helicopter symbol, track vector, trail and optional follow.
+// Following pauses while the user touches the map and stops when the map is dragged, so the
+// route can still be edited normally.
+let mainFollow = false, lastMapTouch = 0;
+function setMainFollow(on) { mainFollow = on; $("btn-my-gps").classList.toggle("on", on); $("gps-btn-label").textContent = on ? "ติดตามตำแหน่ง: เปิด" : "ตำแหน่งฉัน"; }
+function trackVector(g, minutes) {
+  const dNm = g.gs * minutes / 60, R = 3440.065, b = toRad(g.trk), la1 = toRad(g.lat), lo1 = toRad(g.lon), dr = dNm / R;
+  const la2 = Math.asin(Math.sin(la1) * Math.cos(dr) + Math.cos(la1) * Math.sin(dr) * Math.cos(b)), lo2 = lo1 + Math.atan2(Math.sin(b) * Math.sin(dr) * Math.cos(la1), Math.cos(dr) - Math.sin(la1) * Math.sin(la2));
+  return [[g.lat, g.lon], [toDeg(la2), toDeg(lo2)]];
 }
 function drawGps() {
-  const g = state.gps; if (!g) return; L_gps.clearLayers(); const moving = g.gs > 5;
-  if (g.acc && g.acc < 5000) L.circle([g.lat, g.lon], { radius: g.acc, color: "#38bdf8", weight: 1, fillOpacity: .08 }).addTo(L_gps);
-  L.marker([g.lat, g.lon], { zIndexOffset: 900, icon: ownIcon(g, 44) })
+  const g = state.gps; if (!g) return; L_gps.clearLayers();
+  if (g.acc && g.acc < 5000) L.circle([g.lat, g.lon], { radius: g.acc, color: "#38bdf8", weight: 1, fillOpacity: .08, interactive: false }).addTo(L_gps);
+  if (FM.trail.length > 1) L.polyline(FM.trail, { color: "#22d3ee", weight: 3, opacity: .75, interactive: false }).addTo(L_gps);
+  const tgt = state.fly.takeoff && !state.fly.landed ? state.route[state.fly.target] : null;
+  if (tgt) L.polyline([[g.lat, g.lon], [tgt.lat, tgt.lon]], { color: "#22c55e", weight: 2.5, dashArray: "8,6", interactive: false }).addTo(L_gps);
+  if (g.gs > 3) L.polyline(trackVector(g, 5), { color: "#fff", weight: 2.5, opacity: .9, interactive: false }).addTo(L_gps);
+  L.marker([g.lat, g.lon], { zIndexOffset: 900, icon: ownIcon(g, 48) })
     .bindPopup(`<div class="text-xs space-y-1"><b>ตำแหน่ง GPS</b><div class="mono text-cyan-300">${fmtLL(g.lat, g.lon)}</div><div class="mono">GS ${Math.round(g.gs)} kt • TRK ${pad3(toMag(g.trk))}°M${g.alt != null ? ` • ${fmt(g.alt)} ft` : ""}</div><button onclick="addLL(${g.lat},${g.lon},'MY-POS')" class="btn btn-sm w-full">+ ใช้เป็นจุดในเส้นทาง</button></div>`).addTo(L_gps);
+  $("hud-gps").classList.remove("hidden");
+  $("hud-gs").textContent = `${Math.round(g.gs)} kt`; $("hud-trk").textContent = g.gs > 3 ? `${pad3(toMag(g.trk))}°M` : "---"; $("hud-alt").textContent = g.alt != null ? `${fmt(g.alt)} ft` : "--";
+  if (mainFollow && !state.addWpMode && !map._popup && Date.now() - lastMapTouch > 8000 && !(state.fly.on && !state.fly.min)) map.panTo([g.lat, g.lon], { animate: true, duration: .5 });
 }
+map.on("dragstart", () => { if (mainFollow) { setMainFollow(false); toast("หยุดติดตามตำแหน่ง — แก้ไขแผนที่ได้ตามปกติ"); } });
+map.getContainer().addEventListener("pointerdown", () => { lastMapTouch = Date.now(); }, { passive: true });
+map.getContainer().addEventListener("wheel", () => { lastMapTouch = Date.now(); }, { passive: true });
 let gpsWatch = null;
 function startGps(fly) {
   if (!navigator.geolocation) { $("gps-btn-label").textContent = "ไม่มี GPS"; return; }
   if (gpsWatch == null) gpsWatch = navigator.geolocation.watchPosition(p => { const first = !state.gps; onGps(p); if (first && fly) map.flyTo([p.coords.latitude, p.coords.longitude], 11); }, () => { $("gps-btn-label").textContent = "GPS ปิด"; if (fly) toast("เข้าถึงตำแหน่ง GPS ไม่ได้"); }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 });
 }
-$("btn-my-gps").onclick = () => state.gps ? map.flyTo([state.gps.lat, state.gps.lon], 12) : startGps(true);
+$("btn-my-gps").onclick = () => {
+  if (!state.gps) { startGps(true); setMainFollow(true); toast("กำลังหาตำแหน่ง GPS..."); return; }
+  if (mainFollow) { setMainFollow(false); return; }
+  setMainFollow(true); lastMapTouch = 0; map.flyTo([state.gps.lat, state.gps.lon], Math.max(map.getZoom(), 11));
+};
 
 // =========================================================================
 // 12. FLY MODE
@@ -1217,7 +1242,7 @@ function drawFlyDynamic() {
   centerFly(false);
 }
 function onFlyFix() {
-  const g = state.gps; if (!g || !state.fly.on) return;
+  const g = state.gps; if (!g || (g.gs < 3 && !state.fly.on)) return;
   const last = FM.trail[FM.trail.length - 1];
   if (!last || distNM(last[0], last[1], g.lat, g.lon) > .03) { FM.trail.push([g.lat, g.lon]); if (FM.trail.length > 4000) FM.trail.shift(); }
 }
@@ -1269,7 +1294,7 @@ function updateFly() {
   set("t-msa", leg && leg.msa ? fmt(leg.msa) : "--"); set("t-dtk", leg ? pad3(leg.mc) + "°" : "---");
   const nl = state.legs[f.target]; set("t-nxt", nl ? `${pad3(nl.mh)}°` : "—"); set("t-nxt-s", nl ? `${esc(nl.b.id)} • ${nl.dist.toFixed(1)} NM • ${hhmm(nl.h)}` : "จุดสุดท้าย");
   const dap = dest && AIRPORTS.find(a => a.icao === dest.id);
-  $("t-freq").innerHTML = dap ? Object.entries(dap.atc).map(([k, v]) => `<span class="mr-3"><span class="text-slate-400">${k}</span> ${esc(v)}</span>`).join("") + dap.ils.map(l => `<span class="mr-3 text-fuchsia-300"><span class="text-slate-400">ILS ${esc(l.rwy)}</span> ${esc(l.freq || "AIP")}</span>`).join("") : "—";
+  $("t-freq").innerHTML = dap ? Object.entries(dap.atc).map(([k, v]) => `<span class="mr-3 inline-block"><span class="text-slate-400">${atcName(k)}</span> ${atcVal(v)}</span>`).join("") + dap.ils.map(l => `<span class="mr-3 text-fuchsia-300"><span class="text-slate-400">ILS ${esc(l.rwy)}</span> ${esc(l.freq || "AIP")}</span>`).join("") : "—";
   // daylight
   if (dest) { const st = sunTimes(new Date(), dest.lat, dest.lon, 90.833), m = st.set ? (st.set - Date.now()) / 6e4 : null; set("t-sun", m == null ? "--" : m > 0 ? hhmm(m / 60) : "หลังตะวันตก"); set("t-sun-s", st.set ? `ตก ${ict(st.set)} ICT ที่ ${dest.id}` : "--"); $("t-sun").style.color = m != null && m < 30 ? "#ef4444" : ""; }
   $("fly-nogps").style.display = g ? "none" : "";
@@ -1323,7 +1348,7 @@ function printLog(withBrief) {
   const th = "padding:4px 6px;border-bottom:2px solid #0f172a;text-align:left;font-size:10px", td = "padding:4px 6px;border-bottom:1px solid #cbd5e1;font-family:monospace", h3 = "font-size:12px;font-weight:700;border-bottom:2px solid #0f172a;margin:12px 0 4px;padding-bottom:2px";
   let rem = fp.fob - fp.taxi;
   const legRows = state.legs.map(l => { rem -= l.fuel; return `<tr><td style="${td}">${l.i + 1}</td><td style="${td};font-family:sans-serif;font-weight:700">${esc(l.a.id)} → ${esc(l.b.id)}</td><td style="${td}">${pad3(l.tc)}</td><td style="${td};font-weight:700">${pad3(l.mh)}</td><td style="${td}">${l.dist.toFixed(1)}</td><td style="${td}">${Math.round(l.gs)}</td><td style="${td}">${hhmm(l.h)}</td><td style="${td}">${ict(l.eta)}</td><td style="${td}">${fmt(l.fuel)}</td><td style="${td};color:${rem < fp.reserve ? "#dc2626" : "#047857"}">${fmt(rem)}</td><td style="${td}">${l.msa ? fmt(l.msa) : ""}</td><td style="${td};border-left:1px dashed #94a3b8"></td><td style="${td};border-left:1px dashed #94a3b8"></td></tr>`; }).join("");
-  const wpRows = state.route.map((x, i) => { const ap = AIRPORTS.find(a => a.icao === x.id); return `<tr><td style="${td}">${i + 1}</td><td style="${td};font-weight:700">${esc(x.id)}</td><td style="${td}">${fmtLL(x.lat, x.lon)}</td><td style="${td}">${x.elev ? fmt(x.elev) : ""}</td><td style="${td}">${vorFixStr(x.lat, x.lon)}</td><td style="${td};font-size:9px">${ap ? Object.entries(ap.atc).map(([k, v]) => `${k} ${esc(v)}`).join(" • ") : ""}</td></tr>`; }).join("");
+  const wpRows = state.route.map((x, i) => { const ap = AIRPORTS.find(a => a.icao === x.id); return `<tr><td style="${td}">${i + 1}</td><td style="${td};font-weight:700">${esc(x.id)}</td><td style="${td}">${fmtLL(x.lat, x.lon)}</td><td style="${td}">${x.elev ? fmt(x.elev) : ""}</td><td style="${td}">${vorFixStr(x.lat, x.lon)}</td><td style="${td};font-size:9px">${ap ? Object.entries(ap.atc).map(([k, v]) => `${atcName(k)} ${esc(v)}`).join(" • ") : ""}</td></tr>`; }).join("");
   const box = (k, v) => `<div style="border:1px solid #cbd5e1;border-radius:4px;padding:4px 6px"><div style="font-size:8px;color:#64748b">${k}</div><div style="font-size:11px;font-weight:700;font-family:monospace">${v}</div></div>`;
   const wxIcaos = [state.route[0].id, end.id, S.altn].filter((v, i, a) => v && a.indexOf(v) === i && AIRPORTS.some(x => x.icao === v));
   const wxRows = wxIcaos.map(ic => { const mt = state.metar[ic], tf = state.taf[ic]; return `<div style="border:1px solid #cbd5e1;border-radius:4px;padding:3px 6px;margin-bottom:3px;font-family:monospace;font-size:9.5px">${mt ? esc(mt.raw) : `${ic} — no METAR (model only)`}${tf ? `<br/><span style="color:#475569">${esc(tf)}</span>` : ""}</div>`; }).join("");
@@ -1704,7 +1729,7 @@ window.addEventListener("appinstalled", () => { installEvt = null; renderInstall
 $("btn-install-pwa").onclick = doInstall; $("btn-install-2").onclick = doInstall;
 
 // ---- modal ----
-function openAppModal() { renderInstall(); renderOffline(); $("app-modal").classList.remove("hidden"); lucide.createIcons(); }
+function openAppModal() { renderInstall(); renderOffline(); renderLockSettings(); $("app-modal").classList.remove("hidden"); lucide.createIcons(); }
 function closeAppModal() { $("app-modal").classList.add("hidden"); offlineAbort && offlineAbort.abort(); }
 $("btn-app").onclick = openAppModal;
 $("app-modal").addEventListener("click", e => { if (e.target.closest("[data-close]")) closeAppModal(); });
@@ -1828,7 +1853,7 @@ async function shareOrDownload(name, text, type) {
 const stamp = () => new Date().toLocaleString("sv-SE", { timeZone: "Asia/Bangkok" }).slice(0, 16).replace(/[-: ]/g, "");
 $("btn-backup").onclick = () => {
   const data = { app: "thai-heli-vfr-efb", version: APP_VERSION, exported: new Date().toISOString(), data: {} };
-  Object.values(K).forEach(k => { try { const v = localStorage.getItem(k); if (v != null) data.data[k] = JSON.parse(v); } catch (_) {} });
+  Object.values(K).filter(k => k !== K.lock).forEach(k => { try { const v = localStorage.getItem(k); if (v != null) data.data[k] = JSON.parse(v); } catch (_) {} });
   try { data.data[K.oaip] = localStorage.getItem(K.oaip) || ""; } catch (_) {}
   shareOrDownload(`heli-vfr-backup-${stamp()}.json`, JSON.stringify(data, null, 1), "application/json");
 };
@@ -1838,7 +1863,7 @@ $("file-restore").onchange = async e => {
   try {
     const j = JSON.parse(await f.text()); if (j.app !== "thai-heli-vfr-efb" || !j.data) throw new Error("ไม่ใช่ไฟล์สำรองของแอปนี้");
     if (!confirm(`กู้คืนข้อมูลจากไฟล์ (${(j.exported || "").slice(0, 10)})? ข้อมูลปัจจุบันจะถูกแทนที่`)) return;
-    for (const [k, v] of Object.entries(j.data)) { if (!Object.values(K).includes(k)) continue; if (k === K.oaip) localStorage.setItem(k, v); else LS.set(k, v); }
+    for (const [k, v] of Object.entries(j.data)) { if (!Object.values(K).includes(k) || k === K.lock) continue; if (k === K.oaip) localStorage.setItem(k, v); else LS.set(k, v); }
     toast("กู้คืนข้อมูลแล้ว — กำลังโหลดใหม่"); setTimeout(() => location.reload(), 800);
   } catch (err) { toast("กู้คืนไม่สำเร็จ: " + err.message); }
 };
@@ -1885,69 +1910,7 @@ document.addEventListener("visibilitychange", () => { if (state.fly.on && docume
 // =========================================================================
 // 18. NOTAM IMPORT — AEROTHAI Series J list (PDF or pasted text)
 // =========================================================================
-const NOTAM_EVENT_TH = [[/PARAGLID/, "ร่มร่อน (Paragliding)"], [/FIREWORK/, "จุดดอกไม้ไฟ"], [/SKY LANTERN|KHOM LOY/, "ปล่อยโคมลอย"], [/AERIAL PHOTO|AERIAL SURVEY/, "ถ่ายภาพ/สำรวจทางอากาศ"], [/PAPI FLTCK|FLT ?CK|FLIGHT CHECK/, "บินตรวจสอบเครื่องช่วยเดินอากาศ"], [/MIL AIR EXER|AIR EXER/, "ฝึกทางอากาศทางทหาร"], [/BALLOON/, "บอลลูน"], [/AIR ?SHOW|AEROBATIC/, "แสดงการบิน"], [/LASER/, "แสงเลเซอร์"]];
-const NOTAM_CAT_TH = { "UAV/DRONE": "UAV", PJE: "กระโดดร่ม (PJE)", RESTRICTED: "พื้นที่หวงห้ามชั่วคราว", "MIL/FIRING": "ฝึก/ยิงอาวุธ", "OPS/EVENT": "" };
-let notamImportBuf = null;
-const NOTAM_ID_RE = /\b([A-Z]\d{4}\/\d{2})\b/g;
-const altFt = s => { if (!s) return null; const t = s.toUpperCase(); let m = t.match(/FL\s*(\d{2,3})/); if (m) return +m[1] * 100; m = t.match(/(\d[\d,]*)\s*(?:FT|FEET)/); if (m) return +m[1].replace(/,/g, ""); if (/\b(GND|SFC)\b/.test(t)) return 0; if (/UNL/.test(t)) return 99999; return null; };
-const fmtAlt = s => { if (!s) return ""; const t = s.toUpperCase().replace(/\s+/g, " ").trim(); const m = t.match(/^(\d[\d,.]*)\s*(?:FT|FEET)\s*(AMSL|AGL|MSL)?/); return m ? `${fmt(+m[1].replace(/,/g, ""))} FT${m[2] ? " " + (m[2] === "MSL" ? "AMSL" : m[2]) : ""}` : t.replace(/^SFC$/, "GND"); };
-function notamCategory(q, text) {
-  const s = (q || "").slice(1, 3), t = text.toUpperCase();
-  if (/UAV|UNMANNED|DRONE|RPAS/.test(t) || s === "WU") return "UAV/DRONE";
-  if (/\bPJE\b|PARACHUT/.test(t) || s === "WP") return "PJE";
-  if (/FIRING|FRNG|\bGUN|MISSILE|ROCKET|EXPLOSI|BOMB|MIL(ITARY)?( AIR)? EXER|LIVE FIRE/.test(t) || s === "WM") return "MIL/FIRING";
-  if (/RESTRICTED|PROHIBITED|DANGER AREA|\bVT ?[RPD] ?\d+\b/.test(t) || /^R[TRPD]$/.test(s)) return "RESTRICTED";
-  return "OPS/EVENT";
-}
-function parseNotamText(raw) {
-  const text = String(raw || "").replace(/\r/g, "").split("\n")
-    .map(l => l.replace(/Page \d+ of \d+/i, "").replace(/THAILAND INTERNATIONAL NOTAM OFFICE/i, ""))
-    .filter(l => !/NOTAM LIST|(still|were still) valid on|REFERENCE NO\.|TELEPHONE\s*:|^\s*AFS\s*:|FACSIMILE|E\s*-?\s*MAIL\s*:|WWW\.AEROTHAI|AEROTHAI\s*:|SUPERSEDED BY AIP|AERONAUTICAL (INFORMATION|RADIO)|NGAMDU|BANGKOK 10120|INTERNATIONAL NOTAM OFFICE|^\s*(THAILAND|SERIES [A-Z]|\d{2}\/\d{2}|\d{1,2} [A-Z]{3} \d{4})\s*$/i.test(l))
-    .join("\n").replace(/[ \t ]+/g, " ");
-  // AEROTHAI lists group NOTAMs under location headers such as "VTBD (BANGKOK/DON MUEANG INTL AIRPORT)"
-  const heads = [...text.matchAll(/(?:^|\n)\s*(VT[A-Z]{2}) \((?:[^()\n]|\([^()\n]*\))*\)\s*(?=\n|$)/g)].map(h => ({ at: h.index, end: h.index + h[0].length, icao: h[1] }));
-  const starts = []; let m; NOTAM_ID_RE.lastIndex = 0;
-  while ((m = NOTAM_ID_RE.exec(text))) { if (/NOTAM[RC]\s*$/.test(text.slice(Math.max(0, m.index - 10), m.index))) continue; starts.push(m.index); }
-  const out = [], cancelled = new Set(), seen = new Set();
-  starts.forEach((st, i) => {
-    const nextHead = heads.find(h => h.at > st), stop = Math.min(starts[i + 1] ?? text.length, nextHead ? nextHead.at : text.length);
-    const seg = text.slice(st, stop).trim(), id = seg.match(/^[A-Z]\d{4}\/\d{2}/)[0], flat = seg.replace(/\s*\n\s*/g, " ");
-    const secIcao = (heads.filter(h => h.end <= st).pop() || {}).icao;
-    if (seen.has(id)) return; seen.add(id);
-    const c = flat.match(/NOTAMC\s+([A-Z]\d{4}\/\d{2})/); if (c) { cancelled.add(c[1]); return; }
-    const q = flat.match(/Q\)\s*([A-Z]{4})\/(Q[A-Z]{4})\/[^/]*\/[^/]*\/[^/]*\/(\d{3})\/(\d{3})\/(\d{2})(\d{2})([NS])(\d{3})(\d{2})([EW])(\d{3})/);
-    const a = flat.match(/\bA\)\s*([A-Z]{4})/), b = flat.match(/\bB\)\s*(\d{10})/), cc = flat.match(/\bC\)\s*(\d{10}|PERM)/);
-    let from = b && b[1], to = cc && cc[1];
-    if (!from) { const v = flat.match(/(\d{10})\s*(?:\/|-|–|TO)\s*(\d{10}|PERM)/); if (v) { from = v[1]; to = v[2]; } }
-    const field = k => { const r = flat.match(new RegExp(`\\b${k}\\)\\s*(.*?)(?=\\s[A-G]\\)\\s|$)`)); return r ? r[1].trim() : ""; };
-    let e = field("E"); const d = field("D"), f = field("F"), g = field("G");
-    const ll = flat.match(/LOWER LIMIT\s*:\s*(.+?)\s+UPPER LIMIT\s*:\s*(.+?)\s*$/);
-    let sched = "";
-    if (!e) e = flat.replace(/LOWER LIMIT\s*:.*$/, "").replace(/^[A-Z]\d{4}\/\d{2}\s*(NOTAM[NR]\s*([A-Z]\d{4}\/\d{2})?)?/, "").replace(/(\d{10})\s*(?:\/|-|–|TO)\s*(\d{10}|PERM)(\s*EST)?/, "").replace(/^\s*VT[A-Z]{2}\s+(?=\d{10})/, "").trim();
-    if (!b) { const first = seg.split("\n")[0], fv = first.match(/\d{10}\s*(?:\/|-|–|TO)\s*(?:\d{10}|PERM)(?:\s*EST)?\s*(.*)$/); if (fv && fv[1].trim() && !/LOWER LIMIT/.test(fv[1])) { sched = fv[1].trim(); const k = e.indexOf(sched); if (k >= 0) e = (e.slice(0, k) + e.slice(k + sched.length)).trim(); } }
-    if (!b && !sched) { const sm = e.match(/^((?:DAILY|MON|TUE|WED|THU|FRI|SAT|SUN|H24|SR-SS)[A-Z0-9 ,-]*?(?:\d{4}-\d{4}|SS))(?:\s+)(?=[A-Z]{2,}[A-Z ]*[A-Z](?:\s|$))/); if (sm && !d) { sched = sm[1].trim(); e = e.slice(sm[0].length).trim(); } }
-    if (!e && !q) return;
-    const icao = (a && a[1]) || secIcao || (flat.match(/\b(VT[A-Z]{2})\b/) || [])[1] || (q && q[1]) || "VTBB";
-    const category = notamCategory(q && q[2], e);
-    const rm = e.match(/RADIUS\s+(\d+(?:\.\d+)?)\s*NM/i), radius = rm ? +rm[1] : q ? +q[11] : null;
-    const tok = v => (String(v).toUpperCase().match(/GND|SFC|UNL|FL\s?\d{2,3}|\d[\d,.]*\s?FT(?:\s?(?:AMSL|AGL|MSL))?/) || [String(v).trim()])[0];
-    const lim2 = ll ? [null, tok(ll[1]), tok(ll[2])] : !f && !g ? e.match(/\b(GND|SFC|\d[\d,]*\s*FT(?:\s*(?:AMSL|AGL|MSL))?)\s*(?:-|–|TO)\s*(\d[\d,]*\s*FT(?:\s*(?:AMSL|AGL|MSL))?|FL\s*\d{2,3}|UNL)/) : null;
-    const lower = f || (lim2 && lim2[1]) || (q ? (+q[3] ? `FL${q[3]}` : "GND") : ""), upper = g || (lim2 && lim2[2]) || (q && +q[4] && +q[4] < 999 ? `FL${q[4]}` : "");
-    const up = altFt(upper);
-    const severity = /PARAGLID|FIREWORK|SKY LANTERN|KHOM LOY/.test(e) && category === "OPS/EVENT" ? "caution" : category === "RESTRICTED" || category === "MIL/FIRING" || category === "PJE" ? "critical" : category === "UAV/DRONE" ? (up == null || up > 1000 ? "critical" : up > 200 ? "caution" : "info") : "caution";
-    const place = (e.match(/\(([A-Z][A-Z .'-]{3,60}(?:PROVINCE|DISTRICT|AREA))\)/) || [])[1];
-    const area = e.match(/\bVT ?([RPD]) ?(\d+)\b/);
-    const what = area ? `พื้นที่ ${{ R: "หวงห้าม", P: "ห้ามบิน", D: "อันตราย" }[area[1]]} VT ${area[1]}${area[2]} เปิดใช้งาน` : NOTAM_CAT_TH[category] || (NOTAM_EVENT_TH.find(([re]) => re.test(e)) || [])[1] || (e.match(/^(.{3,40}?)\s+WILL\b/) || [])[1] || e.split(/\s+/).slice(0, 4).join(" ");
-    const lim = lower || upper ? ` (${fmtAlt(lower) || "GND"} - ${fmtAlt(upper) || "?"})` : "";
-    const isPoly = parseNotamCoords(e).length >= 3;
-    const title = area ? `${what}${lim}` : `${what} ${place ? place.toLowerCase().replace(/\b\w/g, x => x.toUpperCase()) : icao}${isPoly ? " — พื้นที่กำหนด" : radius ? ` — รัศมี ${radius} NM` : ""}${lim}`;
-    const body = `${e.toUpperCase()}${d || sched ? ` ${d || sched}.` : ""}${lower || upper ? ` LOWER: ${lower || "-"} / UPPER: ${upper || "-"}.` : ""}`;
-    const n = { id, series: `Series ${id[0]}`, icao, category, severity, title, body, valid: from ? `${from} - ${to || "PERM"}` : "PERM", imported: true };
-    if (q) { let la = +q[5] + q[6] / 60, lo = +q[8] + q[9] / 60; if (q[7] === "S") la = -la; if (q[10] === "W") lo = -lo; n.geo = { lat: la, lon: lo, r: +q[11] || 1 }; }
-    out.push(n);
-  });
-  return { list: out, cancelled: [...cancelled] };
-}
+let notamImportBuf = null;   // parser: js/notam-parser.js (NotamParser / parseNotamText)
 async function pdfToText(file) {
   const pdfjs = await import(new URL("vendor/pdfjs/pdf.min.mjs", document.baseURI).href);
   pdfjs.GlobalWorkerOptions.workerSrc = new URL("vendor/pdfjs/pdf.worker.min.mjs", document.baseURI).href;
@@ -1960,8 +1923,9 @@ async function pdfToText(file) {
   return txt;
 }
 function notamSetLabel() {
-  const js = state.notamSet;
-  $("notam-set-date").textContent = js ? `นำเข้า ${new Date(js.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Bangkok" }).toUpperCase()} • ${js.list.length} รายการ` : "ชุดข้อมูล: 1 NOV 2026 (มากับแอป)";
+  const js = state.notamSet, ck = LS.get(K.jcheck, null), d8 = t => new Date(t).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).toUpperCase();
+  $("notam-set-date").textContent = js ? (js.server ? `Series J ณ ${js.listDate || "?"} • ${js.list.length} รายการ` : `นำเข้าเอง ${d8(js.date)} • ${js.list.length} รายการ`) : "Series J ณ 1 NOV 2026 (มากับแอป)";
+  $("notam-update-status").textContent = ck ? `ตรวจล่าสุด ${d8(ck.at)} ICT${ck.fetched ? ` • ระบบดึงจาก AEROTHAI ${d8(ck.fetched)} ICT` : ""}` : "ยังไม่เคยตรวจอัปเดต";
   $("btn-notam-reset").classList.toggle("hidden", !js);
 }
 function previewNotamImport(res, src) {
@@ -1974,7 +1938,7 @@ function previewNotamImport(res, src) {
   $("notam-import-preview").innerHTML = res.list.map(n => `<div class="rounded-lg px-2 py-1.5 text-[11.5px] ${notamExpired(n, now) ? "opacity-40" : ""}" style="background:rgba(2,6,15,.5);border:1px solid var(--line)"><div class="flex items-center gap-1.5"><b class="mono">${esc(n.id)}</b><span class="mono text-slate-400">${esc(n.icao)}</span><span class="pill ${st[n.severity]}">${esc(n.category)}</span>${parseNotamCoords(n.body).length || n.geo ? "" : `<span class="pill pill-warn">ไม่มีพิกัด</span>`}${notamExpired(n, now) ? `<span class="pill pill-info">หมดอายุ</span>` : ""}</div><div class="text-slate-200 truncate">${esc(n.title)}</div><div class="mono text-[10.5px] text-slate-500">${esc(n.valid)}</div></div>`).join("");
   $("notam-import-actions").classList.toggle("hidden", !res.list.length);
 }
-$("btn-open-notam-import").onclick = () => { $("notam-import").classList.toggle("hidden"); $("notam-form").classList.add("hidden"); notamSetLabel(); lucide.createIcons(); };
+$("btn-open-notam-import").onclick = () => { $("notam-import").classList.toggle("hidden"); notamSetLabel(); lucide.createIcons(); };
 $("btn-close-notam-import").onclick = () => $("notam-import").classList.add("hidden");
 $("btn-notam-pick").onclick = () => $("file-notam").click();
 $("btn-notam-parse").onclick = () => { const t = $("notam-paste").value; if (!t.trim()) return toast("วางข้อความ NOTAM ก่อน"); previewNotamImport(parseNotamText(t), "ข้อความที่วาง"); };
@@ -2006,6 +1970,130 @@ $("btn-notam-reset").onclick = () => {
   rebuildNotams(); renderNotams(); renderMapMarkers(); renderBrief(); notamSetLabel(); toast("กลับไปใช้ชุด NOTAM ที่มากับแอปแล้ว");
 };
 
+// =========================================================================
+// 19. SIGN-IN / APP LOCK — PIN (PBKDF2-SHA-256) + optional platform biometrics (WebAuthn)
+// The app has no server, so this protects access on the device: the app opens to a sign-in
+// screen and re-locks after being in the background. Never locks while FLY mode is open.
+// =========================================================================
+const LOCK = { cfg: LS.get(K.lock, null), pin: "", fails: 0, until: 0, hiddenAt: 0 };
+const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function pinHash(pin, salt) {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(pin), "PBKDF2", false, ["deriveBits"]);
+  return b64(await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations: 210000 }, key, 256));
+}
+const isLocked = () => document.documentElement.classList.contains("locked");
+const bioAvailable = async () => { try { return !!(window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); } catch (_) { return false; } };
+function lockDots() { $("lock-dots").innerHTML = Array.from({ length: Math.max(4, LOCK.pin.length) }, (_, i) => `<span class="${i < LOCK.pin.length ? "on" : ""}"></span>`).join(""); }
+function showLock() {
+  if (!LOCK.cfg) return; document.documentElement.classList.add("locked"); LOCK.pin = ""; lockDots();
+  $("lock-msg").textContent = "ใส่ PIN เพื่อเข้าสู่ระบบ"; $("lock-bio").style.visibility = LOCK.cfg.cred ? "visible" : "hidden"; lucide.createIcons();
+  if (LOCK.cfg.cred && document.visibilityState === "visible") setTimeout(bioUnlock, 350);
+}
+function unlock() { document.documentElement.classList.remove("locked"); LOCK.pin = ""; LOCK.fails = 0; setTimeout(() => { map.invalidateSize(); FM.map && FM.map.invalidateSize(); }, 50); }
+async function tryPin() {
+  if (!LOCK.cfg || !LOCK.pin) return;
+  if (Date.now() < LOCK.until) { $("lock-msg").textContent = `ลองใหม่ใน ${Math.ceil((LOCK.until - Date.now()) / 1000)} วินาที`; return; }
+  const ok = await pinHash(LOCK.pin, unb64(LOCK.cfg.salt)) === LOCK.cfg.hash;
+  if (ok) return unlock();
+  LOCK.fails++; LOCK.pin = ""; lockDots();
+  const dots = $("lock-dots"); dots.classList.remove("lk-shake"); void dots.offsetWidth; dots.classList.add("lk-shake"); if (navigator.vibrate) navigator.vibrate(120);
+  if (LOCK.fails >= 5) { LOCK.until = Date.now() + 30e3 * 2 ** Math.min(4, LOCK.fails - 5); $("lock-msg").textContent = `PIN ผิด ${LOCK.fails} ครั้ง — รอ ${Math.round((LOCK.until - Date.now()) / 1000)} วินาที`; }
+  else $("lock-msg").textContent = `PIN ไม่ถูกต้อง (${LOCK.fails}/5)`;
+}
+async function bioUnlock() {
+  if (!LOCK.cfg || !LOCK.cfg.cred || !isLocked()) return;
+  try {
+    await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ type: "public-key", id: unb64(LOCK.cfg.cred) }], userVerification: "required", timeout: 60000 } });
+    unlock();
+  } catch (_) { $("lock-msg").textContent = "ใช้ PIN แทน หรือแตะ 👆 เพื่อสแกนอีกครั้ง"; }
+}
+async function registerBio() {
+  const cred = await navigator.credentials.create({ publicKey: {
+    challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: "THAI HELI-VFR EFB" },
+    user: { id: crypto.getRandomValues(new Uint8Array(16)), name: "pilot", displayName: "THAI HELI-VFR" },
+    pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+    authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "discouraged" }, timeout: 60000, attestation: "none" } });
+  return b64(cred.rawId);
+}
+$("lock-pad").addEventListener("click", e => {
+  const k = e.target.closest("[data-k]"); if (!k) return; const v = k.dataset.k;
+  if (v === "del") LOCK.pin = LOCK.pin.slice(0, -1); else if (LOCK.pin.length < 8) LOCK.pin += v;
+  lockDots(); if (LOCK.cfg && LOCK.pin.length === LOCK.cfg.len) tryPin();
+});
+$("lock-ok").onclick = tryPin; $("lock-bio").onclick = bioUnlock;
+document.addEventListener("keydown", e => {
+  if (!isLocked()) return; e.stopImmediatePropagation();
+  if (/^\d$/.test(e.key) && LOCK.pin.length < 8) { LOCK.pin += e.key; lockDots(); if (LOCK.cfg && LOCK.pin.length === LOCK.cfg.len) tryPin(); }
+  else if (e.key === "Backspace") { LOCK.pin = LOCK.pin.slice(0, -1); lockDots(); } else if (e.key === "Enter") tryPin();
+}, true);
+$("lock-forgot").onclick = async () => {
+  if (!confirm("ลืม PIN: ต้องล้างข้อมูลทั้งหมดในแอปบนเครื่องนี้ (เส้นทาง, Waypoint, ค่าเครื่อง, NOTAM ที่นำเข้า) เพื่อเข้าใช้งานใหม่\n\nถ้ามีไฟล์สำรองข้อมูล (.json) สามารถกู้คืนได้ภายหลัง — ล้างข้อมูลเลยไหม?")) return;
+  try { localStorage.clear(); sessionStorage.clear(); } catch (_) {}
+  try { indexedDB.deleteDatabase("ThaiHeliVfrDB"); } catch (_) {}
+  location.reload();
+};
+document.addEventListener("visibilitychange", () => {
+  if (!LOCK.cfg) return;
+  if (document.visibilityState === "hidden") LOCK.hiddenAt = Date.now();
+  else if (LOCK.hiddenAt && !isLocked() && !(state.fly.on && !state.fly.min) && Date.now() - LOCK.hiddenAt > (LOCK.cfg.auto || 5) * 60e3) showLock();
+});
+// ---- settings card ----
+async function renderLockSettings() {
+  const on = !!LOCK.cfg;
+  $("lock-state").className = `pill ${on ? "pill-go" : "pill-warn"}`; $("lock-state").textContent = on ? "เปิดใช้งาน" : "ยังไม่ตั้งค่า";
+  $("lk-cur-wrap").classList.toggle("hidden", !on); $("btn-lock-now").classList.toggle("hidden", !on); $("btn-lock-off").classList.toggle("hidden", !on);
+  $("btn-lock-save").textContent = on ? "เปลี่ยน PIN / บันทึกการตั้งค่า" : "ตั้ง PIN และเปิดการล็อก";
+  $("lk-auto").value = String(on ? LOCK.cfg.auto || 5 : 5); $("lk-bio").checked = on && !!LOCK.cfg.cred;
+  $("lk-bio").disabled = !(await bioAvailable()); if ($("lk-bio").disabled) $("lk-bio").parentElement.title = "อุปกรณ์/เบราว์เซอร์นี้ไม่รองรับ";
+}
+$("btn-lock-save").onclick = async () => {
+  const n1 = $("lk-new").value.trim(), n2 = $("lk-new2").value.trim(), cur = $("lk-cur").value.trim();
+  if (LOCK.cfg && await pinHash(cur, unb64(LOCK.cfg.salt)) !== LOCK.cfg.hash) return toast("PIN ปัจจุบันไม่ถูกต้อง");
+  let cfg = LOCK.cfg ? { ...LOCK.cfg } : null;
+  if (n1 || !cfg) {
+    if (!/^\d{4,8}$/.test(n1)) return toast("PIN ต้องเป็นตัวเลข 4–8 หลัก");
+    if (n1 !== n2) return toast("PIN ยืนยันไม่ตรงกัน");
+    if (/^(\d)\1+$/.test(n1) || "0123456789".includes(n1) || "9876543210".includes(n1)) return toast("PIN เดาง่ายเกินไป — ใช้ตัวเลขที่ไม่เรียงหรือซ้ำกัน");
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    cfg = { ...(cfg || {}), salt: b64(salt), hash: await pinHash(n1, salt), len: n1.length };
+  }
+  cfg.auto = +$("lk-auto").value;
+  if ($("lk-bio").checked && !cfg.cred) { try { cfg.cred = await registerBio(); } catch (err) { $("lk-bio").checked = false; toast("ตั้งค่าสแกนนิ้ว/ใบหน้าไม่สำเร็จ — ใช้ PIN อย่างเดียว"); } }
+  if (!$("lk-bio").checked) delete cfg.cred;
+  LOCK.cfg = cfg; LS.set(K.lock, cfg); ["lk-new", "lk-new2", "lk-cur"].forEach(id => $(id).value = "");
+  renderLockSettings(); toast("บันทึกการเข้าสู่ระบบแล้ว ✓ ครั้งต่อไปที่เปิดแอปจะต้องใส่ PIN");
+};
+$("btn-lock-now").onclick = () => { closeAppModal(); showLock(); };
+$("btn-lock-off").onclick = async () => {
+  if (await pinHash($("lk-cur").value.trim(), unb64(LOCK.cfg.salt)) !== LOCK.cfg.hash) return toast("ใส่ PIN ปัจจุบันให้ถูกต้องเพื่อปิดการล็อก");
+  LOCK.cfg = null; try { localStorage.removeItem(K.lock); } catch (_) {} idbSet(K.lock, null); $("lk-cur").value = ""; renderLockSettings(); toast("ปิดการล็อกแอปแล้ว");
+};
+if (!window.crypto || !crypto.subtle) { $("btn-lock-save").disabled = true; $("lock-setup").insertAdjacentHTML("afterbegin", `<p class="text-[12px] text-amber-300">ต้องเปิดแอปผ่าน https จึงจะใช้การล็อกได้</p>`); }
+if (LOCK.cfg) showLock(); else document.documentElement.classList.remove("locked");
+
+// ---- automatic Series J update: data/notam-j.json is produced by the "Update NOTAM" GitHub Action ----
+async function updateNotamsFromServer(manual) {
+  const btn = $("btn-notam-update"); if (manual) { btn.disabled = true; toast("กำลังตรวจ NOTAM ล่าสุด..."); }
+  try {
+    const r = await fetch(`./data/notam-j.json?_=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status === 404 ? "ยังไม่มีข้อมูลบนเซิร์ฟเวอร์" : "HTTP " + r.status);
+    const offline = !!r.headers.get("X-THV-Offline"), d = await r.json();
+    if (!Array.isArray(d.list) || !d.list.length) throw new Error("ข้อมูลไม่ถูกต้อง");
+    LS.set(K.jcheck, { at: Date.now(), fetched: d.fetched, listDate: d.listDate });
+    const cur = state.notamSet, same = cur && cur.server && cur.listDate === d.listDate && cur.fetched === d.fetched;
+    if (!manual && cur && !cur.server && new Date(cur.date) > new Date(d.fetched)) { notamSetLabel(); return; }   // keep a newer manual import
+    if (!same) {
+      const cx = new Set(d.cancelled || []);
+      state.notamSet = { date: new Date().toISOString(), source: "AEROTHAI Series J (อัตโนมัติ)", server: true, listDate: d.listDate, fetched: d.fetched, pdf: d.pdf, list: d.list.filter(n => !cx.has(n.id)) };
+      LS.set(K.jset, state.notamSet); rebuildNotams(); renderNotams(); renderMapMarkers(); renderBrief();
+    }
+    notamSetLabel();
+    if (manual || !same) toast(same ? `NOTAM เป็นปัจจุบันแล้ว (รายการ ณ ${d.listDate})` : `อัปเดต NOTAM แล้ว — รายการ ณ ${d.listDate} • ${d.list.length} รายการ${offline ? " (จากแคช)" : ""}`);
+  } catch (err) { notamSetLabel(); if (manual) toast("อัปเดต NOTAM ไม่สำเร็จ: " + (err.message || err)); }
+  finally { btn.disabled = false; }
+}
+$("btn-notam-update").onclick = () => updateNotamsFromServer(true);
 rebuildNotams(); notamSetLabel();
 setInterval(() => { const n = state.notams.length; rebuildNotams(); if (n !== state.notams.length) { renderNotams(); renderMapMarkers(); renderBrief(); } }, 30 * 60e3);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && navigator.onLine && (!state.metarAt || Date.now() - state.metarAt > 5 * 60e3)) { loadMetar(); loadRadar(); } });
@@ -2026,6 +2114,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
   LAYER_TOGGLES.filter(id => id !== "tg-radar").forEach(id => $(id).dispatchEvent(new Event("change")));
   lucide.createIcons(); clocks(); setInterval(clocks, 1000);
   renderNet(); renderInstall(); declutter(); handleLaunchParams();
+  if (navigator.onLine) setTimeout(() => updateNotamsFromServer(false), 2500);
   startGps(false); loadRadar(); loadWeather(); loadMetar();
   setInterval(loadRadar, 5 * 60e3); setInterval(loadWeather, 30 * 60e3); setInterval(loadMetar, 10 * 60e3);
 })();

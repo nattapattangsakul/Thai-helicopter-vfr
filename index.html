@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th" data-build="e1cf374fc4">
+<html lang="th" data-build="2fb6d5ba16">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -19,7 +19,8 @@
 <link rel="manifest" href="./manifest.webmanifest" />
 <link rel="stylesheet" href="./css/fonts.css" />
 <link rel="stylesheet" href="./vendor/leaflet/leaflet.css" />
-<link rel="stylesheet" href="./assets/app.641f84d632.css" />
+<link rel="stylesheet" href="./assets/app.969f542675.css" />
+<script>try{if(localStorage.getItem("thv5_lock"))document.documentElement.classList.add("locked")}catch(e){}</script>
 <script src="./vendor/leaflet/leaflet.js"></script>
 <script src="./vendor/lucide.min.js"></script>
 </head>
@@ -147,6 +148,7 @@
       <span><span class="text-slate-500">POS</span> <b id="hud-coords" class="text-white">--</b></span>
       <span><span class="text-slate-500">ELEV</span> <b id="hud-elev" class="text-amber-300">-- ft</b></span>
       <span><span class="text-slate-500">FIX</span> <b id="hud-vor" class="text-sky-300">--</b></span>
+      <span id="hud-gps" class="hidden"><span class="text-emerald-400">GPS</span> GS <b id="hud-gs" class="text-white">--</b> TRK <b id="hud-trk" class="text-white">---</b> ALT <b id="hud-alt" class="text-white">--</b></span>
     </div>
   </div>
 
@@ -381,7 +383,8 @@
             <a href="https://www.aerothai.co.th/en/pilot/notam" target="_blank" rel="noopener" class="font-semibold text-sky-300 hover:underline">AEROTHAI NOTAM (Series J) ↗</a>
             <span id="notam-set-date" class="mono text-[11px] text-slate-400 text-right">ชุดข้อมูล: 1 NOV 2026</span>
           </div>
-          <p class="text-[11px] text-amber-300/90">NOTAM ไม่ได้ดึงสด (AEROTHAI ไม่มี API สาธารณะ) — ดาวน์โหลด PDF "SERIES J" ล่าสุดจาก AEROTHAI แล้วกด <b>นำเข้า NOTAM</b> เพื่ออัปเดต และตรวจ NOTAM ล่าสุดก่อนบินทุกครั้ง</p>
+          <p id="notam-update-status" class="text-[11px] text-slate-400"></p>
+          <p class="text-[11px] text-amber-300/90">ระบบดึง "NOTAM LIST SERIES J" จาก AEROTHAI ให้อัตโนมัติวันละ 2 ครั้ง กด <b>อัปเดต NOTAM</b> เพื่อรับชุดล่าสุด — AEROTHAI ออกรายการนี้เป็นรอบ (ประมาณเดือนละครั้ง) NOTAM ที่ออกระหว่างรอบจะยังไม่อยู่ในรายการ ตรวจ NOTAM ล่าสุดก่อนบินทุกครั้ง</p>
         </div>
         <div class="flex flex-wrap gap-1.5">
           <select id="notam-icao-filter" class="sel !w-auto !text-[13px]"><option value="ALL">ทุกพื้นที่</option><option value="ROUTE">เฉพาะตามเส้นทาง</option><option value="VTBB">VTBB (FIR)</option></select>
@@ -389,13 +392,13 @@
             <option value="ALL">ทุกหมวด</option><option value="UAV/DRONE">UAV / Drone</option><option value="PJE">Parachute</option><option value="RESTRICTED">Restricted</option><option value="MIL/FIRING">Mil / Firing</option><option value="OPS/EVENT">Event / Photo</option>
           </select>
           <span class="flex gap-1.5 ml-auto">
-            <button id="btn-open-notam-import" class="btn btn-sm text-sky-300"><i data-lucide="file-down" class="w-3.5 h-3.5"></i>นำเข้า NOTAM</button>
-            <button id="btn-open-notam-form" class="btn btn-sm text-amber-300">+ เพิ่ม NOTAM</button>
+            <button id="btn-open-notam-import" class="btn btn-sm" title="นำเข้าจากไฟล์ PDF / ข้อความเอง"><i data-lucide="file-down" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">จากไฟล์</span></button>
+            <button id="btn-notam-update" class="btn btn-sm btn-amber"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>อัปเดต NOTAM</button>
           </span>
         </div>
         <div id="notam-import" class="hidden card !border-sky-500/40">
           <div class="flex items-center justify-between gap-2">
-            <div class="h2"><i data-lucide="file-down" class="text-sky-300"></i>นำเข้า NOTAM (AEROTHAI Series J)</div>
+            <div class="h2"><i data-lucide="file-down" class="text-sky-300"></i>นำเข้า NOTAM จากไฟล์เอง</div>
             <button id="btn-close-notam-import" class="btn btn-sm !px-2" aria-label="ปิด"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
           </div>
           <ol class="text-[12px] text-slate-300 list-decimal pl-5 space-y-0.5">
@@ -420,18 +423,6 @@
           </div>
           <button id="btn-notam-reset" class="btn btn-sm w-full hidden"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>คืนค่าชุดข้อมูลที่มากับแอป</button>
         </div>
-        <form id="notam-form" class="hidden card !border-amber-500/40">
-          <div class="grid grid-cols-3 gap-2">
-            <select id="nn-icao" class="sel"></select>
-            <select id="nn-cat" class="sel"><option>UAV/DRONE</option><option>PJE</option><option>RESTRICTED</option><option>MIL/FIRING</option><option>OPS/EVENT</option></select>
-            <select id="nn-sev" class="sel"><option value="critical">Critical</option><option value="caution" selected>Caution</option><option value="info">Info</option></select>
-          </div>
-          <input id="nn-id" class="inp !text-[14px]" placeholder="เลข NOTAM เช่น J7300/26"/>
-          <input id="nn-title" class="inp !text-[14px]" placeholder="หัวข้อสั้น" required/>
-          <textarea id="nn-body" rows="3" class="inp !text-[13px]" placeholder="วางข้อความ NOTAM เช่น RADIUS 3NM CENTRE 134500N1003000E ..." required></textarea>
-          <input id="nn-valid" class="inp !text-[14px]" placeholder="VALID YYMMDDhhmm - YYMMDDhhmm (UTC)"/>
-          <div class="flex justify-end gap-1.5"><button type="button" id="btn-cancel-notam" class="btn btn-sm">ยกเลิก</button><button class="btn btn-sm btn-amber">บันทึก</button></div>
-        </form>
         <p id="notam-expired-note" class="text-[11px] text-slate-500 px-1"></p>
         <div id="notams-list" class="space-y-2"></div>
       </section>
@@ -601,6 +592,30 @@
 
       <div class="card">
         <div class="flex items-center justify-between gap-2">
+          <div class="h2"><i data-lucide="shield-check" class="text-emerald-300"></i>เข้าสู่ระบบ / ล็อกแอป</div>
+          <span id="lock-state" class="pill pill-info">—</span>
+        </div>
+        <p class="text-[12px] text-slate-400">ต้องใส่ PIN (หรือสแกนนิ้ว/ใบหน้า) ทุกครั้งที่เปิดแอป และเมื่อแอปอยู่เบื้องหลังนานเกินกำหนด — ไม่ล็อกระหว่างอยู่ในโหมดบิน</p>
+        <div id="lock-setup" class="space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="lbl">PIN ใหม่ (4–8 หลัก)</label><input id="lk-new" type="password" inputmode="numeric" autocomplete="new-password" maxlength="8" class="inp" /></div>
+            <div><label class="lbl">ยืนยัน PIN</label><input id="lk-new2" type="password" inputmode="numeric" autocomplete="new-password" maxlength="8" class="inp" /></div>
+          </div>
+          <div id="lk-cur-wrap" class="hidden"><label class="lbl">PIN ปัจจุบัน</label><input id="lk-cur" type="password" inputmode="numeric" autocomplete="current-password" maxlength="8" class="inp" /></div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="lbl">ล็อกเมื่ออยู่เบื้องหลังเกิน</label><select id="lk-auto" class="sel !text-[13px]"><option value="1">1 นาที</option><option value="5" selected>5 นาที</option><option value="15">15 นาที</option><option value="60">1 ชั่วโมง</option></select></div>
+            <label class="flex items-end gap-2 pb-2 text-[12.5px] text-slate-300"><input id="lk-bio" type="checkbox" class="accent-emerald-500 w-5 h-5" />ใช้สแกนนิ้ว / ใบหน้า</label>
+          </div>
+          <div class="flex gap-1.5">
+            <button id="btn-lock-save" class="btn btn-sm btn-go flex-1">บันทึก</button>
+            <button id="btn-lock-now" class="btn btn-sm hidden"><i data-lucide="lock" class="w-3.5 h-3.5"></i>ล็อกตอนนี้</button>
+            <button id="btn-lock-off" class="btn btn-sm btn-red hidden">ปิดการล็อก</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between gap-2">
           <div class="h2"><i data-lucide="map" class="text-sky-300"></i>แผนที่ออฟไลน์ (ตามเส้นทาง)</div>
           <span id="tiles-count" class="mono text-[11px] text-slate-400">—</span>
         </div>
@@ -657,9 +672,27 @@
   <button id="btn-update-later" class="btn btn-sm !px-2" aria-label="ภายหลัง"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
 </div>
 
+<!-- ================= SIGN-IN / APP LOCK ================= -->
+<div id="lock-screen" class="no-print fixed inset-0 z-[4000] flex-col items-center justify-center px-6" style="background:radial-gradient(900px 500px at 50% -10%,#14213d,#03060c);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)" role="dialog" aria-modal="true" aria-labelledby="lock-title">
+  <div class="w-full max-w-[340px] flex flex-col items-center text-center">
+    <img src="./icons/icon.svg" alt="" class="w-16 h-16 rounded-2xl shadow-2xl" />
+    <h2 id="lock-title" class="mt-4 text-[18px] font-bold text-white">THAI HELI-VFR <span class="text-amber-300">EFB</span></h2>
+    <p id="lock-msg" class="mt-1 text-[13px] text-slate-400">ใส่ PIN เพื่อเข้าสู่ระบบ</p>
+    <div id="lock-dots" class="mt-5 flex gap-3 h-4"></div>
+    <div id="lock-pad" class="mt-6 grid grid-cols-3 gap-3 w-full">
+      <button class="lk" data-k="1">1</button><button class="lk" data-k="2">2</button><button class="lk" data-k="3">3</button>
+      <button class="lk" data-k="4">4</button><button class="lk" data-k="5">5</button><button class="lk" data-k="6">6</button>
+      <button class="lk" data-k="7">7</button><button class="lk" data-k="8">8</button><button class="lk" data-k="9">9</button>
+      <button class="lk lk-fn" id="lock-bio" aria-label="สแกนนิ้ว / ใบหน้า"><i data-lucide="fingerprint" class="w-7 h-7"></i></button><button class="lk" data-k="0">0</button><button class="lk lk-fn" data-k="del" aria-label="ลบ"><i data-lucide="delete" class="w-6 h-6"></i></button>
+    </div>
+    <button id="lock-ok" class="btn btn-amber w-full mt-4 !min-h-[44px]">เข้าสู่ระบบ</button>
+    <button id="lock-forgot" class="mt-4 text-[12px] text-slate-500 underline">ลืม PIN?</button>
+  </div>
+</div>
+
 <div id="toast" class="no-print glass fixed left-1/2 -translate-x-1/2 z-[3100] hidden px-4 py-2 rounded-2xl text-slate-100 text-[13px] font-medium" style="top:calc(72px + env(safe-area-inset-top));border-color:rgba(245,165,36,.5)"></div>
 <div id="print-flight-log" class="hidden"></div>
 
-<script src="./assets/app.d51aa9cd13.js"></script>
+<script src="./assets/app.f10a3b5ec6.js"></script>
 </body>
 </html>

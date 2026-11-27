@@ -1,5 +1,5 @@
 /* THAI HELI-VFR EFB — service worker (generated from scripts/sw.template.js by `npm run build`) */
-const VERSION = "e1cf374fc4";
+const VERSION = "2fb6d5ba16";
 const SHELL = `thv-shell-${VERSION}`;
 const TILES = "thv-tiles-v1";      // basemap tiles (also filled by "ดาวน์โหลดแผนที่ออฟไลน์")
 const LIB = "thv-lib-v1";         // on-demand libraries (pdf.js for NOTAM import)
@@ -11,8 +11,8 @@ const PRECACHE = [
   "./index.html",
   "./manifest.webmanifest",
   "./css/fonts.css",
-  "./assets/app.641f84d632.css",
-  "./assets/app.d51aa9cd13.js",
+  "./assets/app.969f542675.css",
+  "./assets/app.f10a3b5ec6.js",
   "./vendor/leaflet/images/layers-2x.png",
   "./vendor/leaflet/images/layers.png",
   "./vendor/leaflet/images/marker-icon-2x.png",
@@ -127,6 +127,7 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  if (url.origin === self.location.origin && url.pathname.includes("/data/")) return e.respondWith(dataStrategy(req));   // NOTAM list etc.: network first
   if (url.origin === self.location.origin) return e.respondWith(shellStrategy(e));
   if (NO_CACHE_HOSTS.test(url.hostname)) return;
   if (TILE_HOSTS.test(url.hostname)) return e.respondWith(tileStrategy(req));
