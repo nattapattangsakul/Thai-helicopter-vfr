@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th" data-build="1bb015f283">
+<html lang="th" data-build="2fb6d5ba16">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -19,7 +19,8 @@
 <link rel="manifest" href="./manifest.webmanifest" />
 <link rel="stylesheet" href="./css/fonts.css" />
 <link rel="stylesheet" href="./vendor/leaflet/leaflet.css" />
-<link rel="stylesheet" href="./assets/app.0134cf643a.css" />
+<link rel="stylesheet" href="./assets/app.969f542675.css" />
+<script>try{if(localStorage.getItem("thv5_lock"))document.documentElement.classList.add("locked")}catch(e){}</script>
 <script src="./vendor/leaflet/leaflet.js"></script>
 <script src="./vendor/lucide.min.js"></script>
 </head>
@@ -147,6 +148,7 @@
       <span><span class="text-slate-500">POS</span> <b id="hud-coords" class="text-white">--</b></span>
       <span><span class="text-slate-500">ELEV</span> <b id="hud-elev" class="text-amber-300">-- ft</b></span>
       <span><span class="text-slate-500">FIX</span> <b id="hud-vor" class="text-sky-300">--</b></span>
+      <span id="hud-gps" class="hidden"><span class="text-emerald-400">GPS</span> GS <b id="hud-gs" class="text-white">--</b> TRK <b id="hud-trk" class="text-white">---</b> ALT <b id="hud-alt" class="text-white">--</b></span>
     </div>
   </div>
 
@@ -235,7 +237,7 @@
         <div class="card">
           <div class="flex items-center justify-between">
             <div class="h2"><i data-lucide="table" class="text-emerald-300"></i>Navlog (แก้ลมแล้ว)</div>
-            <button id="btn-print" class="btn btn-sm text-sky-300"><i data-lucide="printer" class="w-3.5 h-3.5"></i>พิมพ์ Flight Log</button>
+            <button id="btn-print" class="btn btn-sm text-sky-300"><i data-lucide="file-down" class="w-3.5 h-3.5"></i>Flight Log PDF</button>
           </div>
           <div class="overflow-x-auto -mx-1">
             <table class="w-full text-[12px] mono">
@@ -361,7 +363,7 @@
           </div>
           <div id="checklist" class="space-y-0.5"></div>
         </div>
-        <button id="btn-print2" class="btn w-full text-sky-300"><i data-lucide="printer" class="w-4 h-4"></i>พิมพ์ Flight Log + Briefing (PDF)</button>
+        <button id="btn-print2" class="btn w-full text-sky-300"><i data-lucide="file-down" class="w-4 h-4"></i>Flight Log + Briefing (PDF)</button>
       </section>
 
       <!-- ===== TAB: AIRPORTS ===== -->
@@ -381,7 +383,8 @@
             <a href="https://www.aerothai.co.th/en/pilot/notam" target="_blank" rel="noopener" class="font-semibold text-sky-300 hover:underline">AEROTHAI NOTAM (Series J) ↗</a>
             <span id="notam-set-date" class="mono text-[11px] text-slate-400 text-right">ชุดข้อมูล: 1 NOV 2026</span>
           </div>
-          <p class="text-[11px] text-amber-300/90">NOTAM ไม่ได้ดึงสด (AEROTHAI ไม่มี API สาธารณะ) — ดาวน์โหลด PDF "SERIES J" ล่าสุดจาก AEROTHAI แล้วกด <b>นำเข้า NOTAM</b> เพื่ออัปเดต และตรวจ NOTAM ล่าสุดก่อนบินทุกครั้ง</p>
+          <p id="notam-update-status" class="text-[11px] text-slate-400"></p>
+          <p class="text-[11px] text-amber-300/90">ระบบดึง "NOTAM LIST SERIES J" จาก AEROTHAI ให้อัตโนมัติวันละ 2 ครั้ง กด <b>อัปเดต NOTAM</b> เพื่อรับชุดล่าสุด — AEROTHAI ออกรายการนี้เป็นรอบ (ประมาณเดือนละครั้ง) NOTAM ที่ออกระหว่างรอบจะยังไม่อยู่ในรายการ ตรวจ NOTAM ล่าสุดก่อนบินทุกครั้ง</p>
         </div>
         <div class="flex flex-wrap gap-1.5">
           <select id="notam-icao-filter" class="sel !w-auto !text-[13px]"><option value="ALL">ทุกพื้นที่</option><option value="ROUTE">เฉพาะตามเส้นทาง</option><option value="VTBB">VTBB (FIR)</option></select>
@@ -389,13 +392,13 @@
             <option value="ALL">ทุกหมวด</option><option value="UAV/DRONE">UAV / Drone</option><option value="PJE">Parachute</option><option value="RESTRICTED">Restricted</option><option value="MIL/FIRING">Mil / Firing</option><option value="OPS/EVENT">Event / Photo</option>
           </select>
           <span class="flex gap-1.5 ml-auto">
-            <button id="btn-open-notam-import" class="btn btn-sm text-sky-300"><i data-lucide="file-down" class="w-3.5 h-3.5"></i>นำเข้า NOTAM</button>
-            <button id="btn-open-notam-form" class="btn btn-sm text-amber-300">+ เพิ่ม NOTAM</button>
+            <button id="btn-open-notam-import" class="btn btn-sm" title="นำเข้าจากไฟล์ PDF / ข้อความเอง"><i data-lucide="file-down" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">จากไฟล์</span></button>
+            <button id="btn-notam-update" class="btn btn-sm btn-amber"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>อัปเดต NOTAM</button>
           </span>
         </div>
         <div id="notam-import" class="hidden card !border-sky-500/40">
           <div class="flex items-center justify-between gap-2">
-            <div class="h2"><i data-lucide="file-down" class="text-sky-300"></i>นำเข้า NOTAM (AEROTHAI Series J)</div>
+            <div class="h2"><i data-lucide="file-down" class="text-sky-300"></i>นำเข้า NOTAM จากไฟล์เอง</div>
             <button id="btn-close-notam-import" class="btn btn-sm !px-2" aria-label="ปิด"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
           </div>
           <ol class="text-[12px] text-slate-300 list-decimal pl-5 space-y-0.5">
@@ -420,18 +423,6 @@
           </div>
           <button id="btn-notam-reset" class="btn btn-sm w-full hidden"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>คืนค่าชุดข้อมูลที่มากับแอป</button>
         </div>
-        <form id="notam-form" class="hidden card !border-amber-500/40">
-          <div class="grid grid-cols-3 gap-2">
-            <select id="nn-icao" class="sel"></select>
-            <select id="nn-cat" class="sel"><option>UAV/DRONE</option><option>PJE</option><option>RESTRICTED</option><option>MIL/FIRING</option><option>OPS/EVENT</option></select>
-            <select id="nn-sev" class="sel"><option value="critical">Critical</option><option value="caution" selected>Caution</option><option value="info">Info</option></select>
-          </div>
-          <input id="nn-id" class="inp !text-[14px]" placeholder="เลข NOTAM เช่น J7300/26"/>
-          <input id="nn-title" class="inp !text-[14px]" placeholder="หัวข้อสั้น" required/>
-          <textarea id="nn-body" rows="3" class="inp !text-[13px]" placeholder="วางข้อความ NOTAM เช่น RADIUS 3NM CENTRE 134500N1003000E ..." required></textarea>
-          <input id="nn-valid" class="inp !text-[14px]" placeholder="VALID YYMMDDhhmm - YYMMDDhhmm (UTC)"/>
-          <div class="flex justify-end gap-1.5"><button type="button" id="btn-cancel-notam" class="btn btn-sm">ยกเลิก</button><button class="btn btn-sm btn-amber">บันทึก</button></div>
-        </form>
         <p id="notam-expired-note" class="text-[11px] text-slate-500 px-1"></p>
         <div id="notams-list" class="space-y-2"></div>
       </section>
@@ -505,35 +496,75 @@
   </aside>
 </div>
 
-<!-- ================= FLY MODE ================= -->
-<div id="fly-overlay" class="no-print hidden fixed inset-0 z-[2000] flex flex-col" style="background:radial-gradient(1200px 600px at 50% -10%,#0f1a30,#03060c);padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);">
-  <div class="flex flex-wrap items-center gap-2 px-3 py-2.5" style="border-bottom:1px solid var(--line)">
-    <select id="fly-wp" class="sel !w-auto !text-[16px] !font-bold !text-amber-300 mono"></select>
-    <button id="fly-prev" class="btn"><i data-lucide="skip-back" class="w-4 h-4"></i></button>
-    <button id="fly-next" class="btn"><i data-lucide="skip-forward" class="w-4 h-4"></i></button>
-    <div class="mono text-[14px] px-2"><span class="text-slate-400">FLT</span> <b id="fly-timer" class="text-emerald-300 text-[18px]">00:00:00</b></div>
-    <button id="fly-takeoff" class="btn btn-go">Takeoff</button>
-    <div class="ml-auto flex items-center gap-2">
-      <span id="fly-gps" class="pill pill-warn">GPS --</span>
-      <button id="fly-night" class="btn" title="หรี่จอกลางคืน"><i data-lucide="moon" class="w-4 h-4"></i></button>
-      <button id="fly-min" class="btn" title="ย่อดูแผนที่"><i data-lucide="map" class="w-4 h-4"></i>แผนที่</button>
-      <button id="fly-exit" class="btn btn-red"><i data-lucide="x" class="w-4 h-4"></i>ออก</button>
+<!-- ================= FLY MODE (moving map + nav panel) ================= -->
+<div id="fly-overlay" class="no-print hidden fixed inset-0 z-[2000] flex flex-col bg-[#03060c]" style="padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);">
+  <!-- top bar -->
+  <div class="fly-top flex items-center gap-1.5 px-2 py-1.5">
+    <button id="fly-exit" class="fbtn" title="ออกจากโหมดบิน" aria-label="ออกจากโหมดบิน"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <button id="fly-prev" class="fbtn hidden sm:flex" title="จุดก่อนหน้า" aria-label="จุดก่อนหน้า"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+    <label class="relative min-w-[84px] flex-1 sm:flex-none">
+      <span class="hidden sm:block text-[10px] leading-none text-slate-400 pl-0.5">มุ่งหน้า</span>
+      <select id="fly-wp" class="fly-wp-sel"></select>
+    </label>
+    <button id="fly-next" class="fbtn" title="จุดถัดไป" aria-label="จุดถัดไป"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+    <div class="hidden md:flex flex-col leading-none mono ml-2"><span class="text-[10px] text-slate-400">FLT</span><b id="fly-timer" class="text-emerald-300 text-[17px]">00:00:00</b></div>
+    <div class="ml-auto flex items-center gap-1.5">
+      <span id="fly-gps" class="pill pill-warn !text-[10.5px] !py-1">GPS --</span>
+      <button id="fly-takeoff" class="btn btn-go !min-h-[40px] !px-3">Takeoff</button>
+      <button id="fly-night" class="fbtn hidden sm:flex" title="หรี่จอกลางคืน" aria-label="หรี่จอกลางคืน"><i data-lucide="moon" class="w-5 h-5"></i></button>
+      <button id="fly-min" class="fbtn" title="กลับหน้าวางแผน (โหมดบินทำงานต่อ)" aria-label="กลับหน้าวางแผน"><i data-lucide="panel-bottom-open" class="w-5 h-5"></i></button>
     </div>
   </div>
-  <div class="flex-1 overflow-y-auto p-3 grid grid-cols-2 md:grid-cols-4 gap-2.5 content-start">
-    <div class="tile !border-amber-500/50"><div class="k">ระยะถึง <span id="t-wpname" class="text-amber-300 mono"></span></div><div class="v" id="t-dist">--</div><div class="s">NM</div></div>
-    <div class="tile !border-amber-500/50"><div class="k">BRG ไปจุด (°M)</div><div class="v" id="t-brg">--</div><div class="s" id="t-brg-s">TRK --</div></div>
-    <div class="tile"><div class="k">ETE / ETA จุดถัดไป</div><div class="v" id="t-ete">--</div><div class="s" id="t-eta">ETA --</div></div>
-    <div class="tile"><div class="k">Ground Speed</div><div class="v" id="t-gs">--</div><div class="s">kt</div></div>
-    <div class="tile"><div class="k">MH ตามแผน (แก้ลม)</div><div class="v" id="t-mh">--</div><div class="s" id="t-mh-s">--</div></div>
-    <div class="tile"><div class="k">Cross-track</div><div class="v" id="t-xte">--</div><div class="s" id="t-xte-s">NM</div></div>
-    <div class="tile"><div class="k">GPS ALT</div><div class="v" id="t-alt">--</div><div class="s" id="t-alt-s">ft MSL</div></div>
-    <div class="tile"><div class="k">MSA ขานี้</div><div class="v" id="t-msa">--</div><div class="s">ft MSL</div></div>
-    <div class="tile !border-sky-500/50"><div class="k">น้ำมันคงเหลือ (ประมาณ)</div><div class="v" id="t-fuel">--</div><div class="s" id="t-fuel-s">lbs</div></div>
-    <div class="tile"><div class="k">ปลายทาง <span id="t-destname" class="mono text-slate-300"></span></div><div class="v" id="t-ddist">--</div><div class="s" id="t-deta">ETA --</div></div>
-    <div class="tile"><div class="k">ความถี่ปลายทาง</div><div class="mono text-[14px] text-emerald-300 leading-relaxed" id="t-freq">--</div></div>
+
+  <div id="fly-body" class="flex-1 min-h-0">
+    <!-- moving map -->
+    <div id="fly-map-wrap" class="relative min-h-0 min-w-0">
+      <div id="fly-map" class="absolute inset-0"></div>
+      <!-- primary nav strip -->
+      <div class="fly-strip-top">
+        <div class="fcell"><span>DIS <b id="t-wpname" class="text-amber-300"></b></span><b id="t-dist">--</b><small>NM</small></div>
+        <div class="fcell"><span>BRG</span><b id="t-brg">--</b><small>°M</small></div>
+        <div class="fcell"><span>ETE</span><b id="t-ete">--</b><small id="t-eta">ETA --</small></div>
+        <div class="fcell"><span>GS</span><b id="t-gs">--</b><small>kt</small></div>
+      </div>
+      <!-- CDI / track -->
+      <div class="fly-cdi">
+        <div class="flex justify-between items-baseline mono text-[11px] text-slate-300 px-0.5">
+          <span>DTK <b id="t-dtk" class="text-fuchsia-300 text-[13px]">---</b></span>
+          <span id="t-xte-s" class="text-slate-400">XTE --</span>
+          <span>TRK <b id="t-trk" class="text-white text-[13px]">---</b></span>
+        </div>
+        <div class="cdi-bar"><i></i><i></i><i></i><i></i><i class="mid"></i><i></i><i></i><i></i><i></i><b id="cdi-needle"></b></div>
+        <div class="flex justify-between text-[9.5px] text-slate-500 mono px-0.5"><span>2 NM</span><span id="t-xte">--</span><span>2 NM</span></div>
+      </div>
+      <!-- map controls -->
+      <div class="fly-mapbtns">
+        <button id="fm-zin" class="fbtn" aria-label="ซูมเข้า"><i data-lucide="plus" class="w-5 h-5"></i></button>
+        <button id="fm-zout" class="fbtn" aria-label="ซูมออก"><i data-lucide="minus" class="w-5 h-5"></i></button>
+        <button id="fm-follow" class="fbtn on" title="ติดตามตำแหน่ง" aria-label="ติดตามตำแหน่ง"><i data-lucide="locate-fixed" class="w-5 h-5"></i></button>
+        <button id="fm-base" class="fbtn" title="เปลี่ยนแผนที่" aria-label="เปลี่ยนแผนที่"><i data-lucide="layers" class="w-5 h-5"></i></button>
+      </div>
+      <div id="fm-range" class="fly-range mono">-- NM</div>
+      <div id="fly-nogps" class="fly-nogps" style="display:none"><i data-lucide="satellite-dish" class="w-4 h-4"></i><span>กำลังรอสัญญาณ GPS — อนุญาตการเข้าถึงตำแหน่ง</span></div>
+    </div>
+
+    <!-- data panel -->
+    <div id="fly-panel" class="overflow-y-auto overscroll-contain">
+      <div class="fgrid">
+        <div class="ftile"><span>MH ตามแผน (แก้ลม)</span><b id="t-mh">--</b><small id="t-mh-s">--</small></div>
+        <div class="ftile"><span>GPS ALT</span><b id="t-alt">--</b><small id="t-alt-s">ft MSL</small></div>
+        <div class="ftile"><span>MSA ขานี้</span><b id="t-msa">--</b><small>ft MSL</small></div>
+        <div class="ftile"><span>ขาถัดไป</span><b id="t-nxt">--</b><small id="t-nxt-s">--</small></div>
+        <div class="ftile wide" id="t-fuel-tile"><span>น้ำมันคงเหลือ (ประมาณ)</span><b id="t-fuel">--</b><small id="t-fuel-s">lbs</small><div class="fbar"><i id="t-fuel-bar"></i></div></div>
+        <div class="ftile wide"><span>ปลายทาง <b id="t-destname" class="mono text-slate-200"></b></span><b id="t-ddist">--</b><small id="t-deta">ETA --</small></div>
+        <div class="ftile"><span>น้ำมันเมื่อถึง</span><b id="t-fdest">--</b><small id="t-fdest-s">lbs</small></div>
+        <div class="ftile"><span>แสงกลางวัน</span><b id="t-sun">--</b><small id="t-sun-s">ถึงพระอาทิตย์ตก</small></div>
+        <div class="ftile wide"><span>ความถี่ปลายทาง</span><div class="mono text-[13px] text-emerald-300 leading-relaxed" id="t-freq">--</div></div>
+        <div class="ftile wide md:hidden"><span>เวลาบิน</span><b id="t-flt" class="!text-emerald-300">00:00:00</b><small id="t-clock">--</small></div>
+      </div>
+      <p class="px-3 pb-3 text-[10.5px] text-slate-500 leading-relaxed">ใช้ประกอบการเดินอากาศ VFR เท่านั้น — ไม่ใช่อุปกรณ์นำร่องหลัก/ระบบหลีกเลี่ยงการชน • น้ำมันคำนวณจากเวลาบิน × อัตราสิ้นเปลือง ตรวจเกจจริงเสมอ</p>
+    </div>
   </div>
-  <p class="px-3 pb-2 text-[11px] text-slate-500">ใช้ประกอบการเดินอากาศ VFR เท่านั้น — ไม่ใช่อุปกรณ์นำร่องหลัก/ระบบหลีกเลี่ยงการชน • น้ำมันคงเหลือคำนวณจากเวลาบิน × อัตราสิ้นเปลือง ตรวจเกจจริงเสมอ</p>
 </div>
 
 <!-- ================= APP / SETTINGS SHEET ================= -->
@@ -557,6 +588,30 @@
         </div>
         <button id="btn-install-2" class="btn btn-go w-full hidden"><i data-lucide="download" class="w-4 h-4"></i>ติดตั้งแอปเลย</button>
         <div id="install-help" class="text-[12.5px] text-slate-300 space-y-2"></div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between gap-2">
+          <div class="h2"><i data-lucide="shield-check" class="text-emerald-300"></i>เข้าสู่ระบบ / ล็อกแอป</div>
+          <span id="lock-state" class="pill pill-info">—</span>
+        </div>
+        <p class="text-[12px] text-slate-400">ต้องใส่ PIN (หรือสแกนนิ้ว/ใบหน้า) ทุกครั้งที่เปิดแอป และเมื่อแอปอยู่เบื้องหลังนานเกินกำหนด — ไม่ล็อกระหว่างอยู่ในโหมดบิน</p>
+        <div id="lock-setup" class="space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="lbl">PIN ใหม่ (4–8 หลัก)</label><input id="lk-new" type="password" inputmode="numeric" autocomplete="new-password" maxlength="8" class="inp" /></div>
+            <div><label class="lbl">ยืนยัน PIN</label><input id="lk-new2" type="password" inputmode="numeric" autocomplete="new-password" maxlength="8" class="inp" /></div>
+          </div>
+          <div id="lk-cur-wrap" class="hidden"><label class="lbl">PIN ปัจจุบัน</label><input id="lk-cur" type="password" inputmode="numeric" autocomplete="current-password" maxlength="8" class="inp" /></div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="lbl">ล็อกเมื่ออยู่เบื้องหลังเกิน</label><select id="lk-auto" class="sel !text-[13px]"><option value="1">1 นาที</option><option value="5" selected>5 นาที</option><option value="15">15 นาที</option><option value="60">1 ชั่วโมง</option></select></div>
+            <label class="flex items-end gap-2 pb-2 text-[12.5px] text-slate-300"><input id="lk-bio" type="checkbox" class="accent-emerald-500 w-5 h-5" />ใช้สแกนนิ้ว / ใบหน้า</label>
+          </div>
+          <div class="flex gap-1.5">
+            <button id="btn-lock-save" class="btn btn-sm btn-go flex-1">บันทึก</button>
+            <button id="btn-lock-now" class="btn btn-sm hidden"><i data-lucide="lock" class="w-3.5 h-3.5"></i>ล็อกตอนนี้</button>
+            <button id="btn-lock-off" class="btn btn-sm btn-red hidden">ปิดการล็อก</button>
+          </div>
+        </div>
       </div>
 
       <div class="card">
@@ -617,9 +672,27 @@
   <button id="btn-update-later" class="btn btn-sm !px-2" aria-label="ภายหลัง"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
 </div>
 
+<!-- ================= SIGN-IN / APP LOCK ================= -->
+<div id="lock-screen" class="no-print fixed inset-0 z-[4000] flex-col items-center justify-center px-6" style="background:radial-gradient(900px 500px at 50% -10%,#14213d,#03060c);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)" role="dialog" aria-modal="true" aria-labelledby="lock-title">
+  <div class="w-full max-w-[340px] flex flex-col items-center text-center">
+    <img src="./icons/icon.svg" alt="" class="w-16 h-16 rounded-2xl shadow-2xl" />
+    <h2 id="lock-title" class="mt-4 text-[18px] font-bold text-white">THAI HELI-VFR <span class="text-amber-300">EFB</span></h2>
+    <p id="lock-msg" class="mt-1 text-[13px] text-slate-400">ใส่ PIN เพื่อเข้าสู่ระบบ</p>
+    <div id="lock-dots" class="mt-5 flex gap-3 h-4"></div>
+    <div id="lock-pad" class="mt-6 grid grid-cols-3 gap-3 w-full">
+      <button class="lk" data-k="1">1</button><button class="lk" data-k="2">2</button><button class="lk" data-k="3">3</button>
+      <button class="lk" data-k="4">4</button><button class="lk" data-k="5">5</button><button class="lk" data-k="6">6</button>
+      <button class="lk" data-k="7">7</button><button class="lk" data-k="8">8</button><button class="lk" data-k="9">9</button>
+      <button class="lk lk-fn" id="lock-bio" aria-label="สแกนนิ้ว / ใบหน้า"><i data-lucide="fingerprint" class="w-7 h-7"></i></button><button class="lk" data-k="0">0</button><button class="lk lk-fn" data-k="del" aria-label="ลบ"><i data-lucide="delete" class="w-6 h-6"></i></button>
+    </div>
+    <button id="lock-ok" class="btn btn-amber w-full mt-4 !min-h-[44px]">เข้าสู่ระบบ</button>
+    <button id="lock-forgot" class="mt-4 text-[12px] text-slate-500 underline">ลืม PIN?</button>
+  </div>
+</div>
+
 <div id="toast" class="no-print glass fixed left-1/2 -translate-x-1/2 z-[3100] hidden px-4 py-2 rounded-2xl text-slate-100 text-[13px] font-medium" style="top:calc(72px + env(safe-area-inset-top));border-color:rgba(245,165,36,.5)"></div>
 <div id="print-flight-log" class="hidden"></div>
 
-<script src="./assets/app.987845612a.js"></script>
+<script src="./assets/app.f10a3b5ec6.js"></script>
 </body>
 </html>
