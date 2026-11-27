@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th" data-build="2fb6d5ba16">
+<html lang="th" data-build="354bb05a97">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="./css/fonts.css" />
 <link rel="stylesheet" href="./vendor/leaflet/leaflet.css" />
 <link rel="stylesheet" href="./assets/app.969f542675.css" />
-<script>try{if(localStorage.getItem("thv5_lock"))document.documentElement.classList.add("locked")}catch(e){}</script>
+<script>try{if(window.crypto&&crypto.subtle)document.documentElement.classList.add("locked")}catch(e){}</script>
 <script src="./vendor/leaflet/leaflet.js"></script>
 <script src="./vendor/lucide.min.js"></script>
 </head>
@@ -595,7 +595,7 @@
           <div class="h2"><i data-lucide="shield-check" class="text-emerald-300"></i>เข้าสู่ระบบ / ล็อกแอป</div>
           <span id="lock-state" class="pill pill-info">—</span>
         </div>
-        <p class="text-[12px] text-slate-400">ต้องใส่ PIN (หรือสแกนนิ้ว/ใบหน้า) ทุกครั้งที่เปิดแอป และเมื่อแอปอยู่เบื้องหลังนานเกินกำหนด — ไม่ล็อกระหว่างอยู่ในโหมดบิน</p>
+        <p class="text-[12px] text-slate-400">เปลี่ยน PIN / ตั้งค่าสแกนนิ้ว-ใบหน้า • ต้องเข้าสู่ระบบทุกครั้งที่เปิดแอป และเมื่อแอปอยู่เบื้องหลังนานเกินกำหนด — ไม่ล็อกระหว่างอยู่ในโหมดบิน</p>
         <div id="lock-setup" class="space-y-2">
           <div class="grid grid-cols-2 gap-2">
             <div><label class="lbl">PIN ใหม่ (4–8 หลัก)</label><input id="lk-new" type="password" inputmode="numeric" autocomplete="new-password" maxlength="8" class="inp" /></div>
@@ -609,7 +609,6 @@
           <div class="flex gap-1.5">
             <button id="btn-lock-save" class="btn btn-sm btn-go flex-1">บันทึก</button>
             <button id="btn-lock-now" class="btn btn-sm hidden"><i data-lucide="lock" class="w-3.5 h-3.5"></i>ล็อกตอนนี้</button>
-            <button id="btn-lock-off" class="btn btn-sm btn-red hidden">ปิดการล็อก</button>
           </div>
         </div>
       </div>
@@ -686,6 +685,10 @@
       <button class="lk lk-fn" id="lock-bio" aria-label="สแกนนิ้ว / ใบหน้า"><i data-lucide="fingerprint" class="w-7 h-7"></i></button><button class="lk" data-k="0">0</button><button class="lk lk-fn" data-k="del" aria-label="ลบ"><i data-lucide="delete" class="w-6 h-6"></i></button>
     </div>
     <button id="lock-ok" class="btn btn-amber w-full mt-4 !min-h-[44px]">เข้าสู่ระบบ</button>
+    <div id="lock-biostep" class="hidden w-full mt-4 space-y-2">
+      <button id="lock-bio-yes" class="btn btn-go w-full !min-h-[44px]"><i data-lucide="fingerprint" class="w-5 h-5"></i>เปิดใช้สแกนนิ้ว / ใบหน้า</button>
+      <button id="lock-bio-no" class="btn w-full !min-h-[44px]">ใช้ PIN อย่างเดียว</button>
+    </div>
     <button id="lock-forgot" class="mt-4 text-[12px] text-slate-500 underline">ลืม PIN?</button>
   </div>
 </div>
@@ -693,6 +696,6 @@
 <div id="toast" class="no-print glass fixed left-1/2 -translate-x-1/2 z-[3100] hidden px-4 py-2 rounded-2xl text-slate-100 text-[13px] font-medium" style="top:calc(72px + env(safe-area-inset-top));border-color:rgba(245,165,36,.5)"></div>
 <div id="print-flight-log" class="hidden"></div>
 
-<script src="./assets/app.f10a3b5ec6.js"></script>
+<script src="./assets/app.112d7cb2ec.js"></script>
 </body>
 </html>

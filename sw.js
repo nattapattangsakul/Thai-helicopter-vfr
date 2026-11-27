@@ -1,5 +1,5 @@
 /* THAI HELI-VFR EFB — service worker (generated from scripts/sw.template.js by `npm run build`) */
-const VERSION = "2fb6d5ba16";
+const VERSION = "354bb05a97";
 const SHELL = `thv-shell-${VERSION}`;
 const TILES = "thv-tiles-v1";      // basemap tiles (also filled by "ดาวน์โหลดแผนที่ออฟไลน์")
 const LIB = "thv-lib-v1";         // on-demand libraries (pdf.js for NOTAM import)
@@ -12,7 +12,7 @@ const PRECACHE = [
   "./manifest.webmanifest",
   "./css/fonts.css",
   "./assets/app.969f542675.css",
-  "./assets/app.f10a3b5ec6.js",
+  "./assets/app.112d7cb2ec.js",
   "./vendor/leaflet/images/layers-2x.png",
   "./vendor/leaflet/images/layers.png",
   "./vendor/leaflet/images/marker-icon-2x.png",
