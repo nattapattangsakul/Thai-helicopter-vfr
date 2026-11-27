@@ -843,7 +843,7 @@ function renderBrief() {
       else if (mins != null) add(mins >= 30 ? "go" : mins >= 0 ? "warn" : "stop", "แสงกลางวัน", mins >= 0 ? `ถึงก่อนตะวันตก ${hhmm(mins / 60)} ชม.` : "ถึงหลังพระอาทิตย์ตก");
     }
   }
-  $("sun-out").innerHTML = sunHtml;
+  $("sun-out").innerHTML = sunHtml; state.briefItems = items;
   const ic = { go: ["check-circle-2", "text-emerald-400"], warn: ["alert-triangle", "text-amber-300"], stop: ["x-octagon", "text-rose-400"], info: ["info", "text-sky-300"] };
   $("go-list").innerHTML = items.map(i => `<div class="row-st"><i data-lucide="${ic[i.st][0]}" class="w-4 h-4 mt-0.5 shrink-0 ${ic[i.st][1]}"></i><div><div class="font-medium text-slate-100">${esc(i.t)}</div><div class="text-[12px] text-slate-400">${esc(i.d)}</div></div></div>`).join("");
   const anyStop = items.some(i => i.st === "stop"), anyWarn = items.some(i => i.st === "warn" || i.st === "info");
@@ -1132,14 +1132,12 @@ function onGps(pos) {
   if (lastFix && (gs == null || trk == null)) { const d = distNM(lastFix.lat, lastFix.lon, c.latitude, c.longitude), dt = (now - lastFix.t) / 3600e3; if (dt > 0 && d > .003) { if (gs == null) gs = d / dt; if (trk == null) trk = brgT(lastFix.lat, lastFix.lon, c.latitude, c.longitude); } }
   state.gps = { lat: c.latitude, lon: c.longitude, alt: c.altitude != null ? c.altitude * 3.28084 : null, gs: gs ?? 0, trk: trk ?? (state.gps?.trk ?? 0), acc: c.accuracy, t: now };
   lastFix = { lat: c.latitude, lon: c.longitude, t: now };
-  drawGps(); $("gps-btn-label").textContent = "GPS ON"; $("btn-my-gps").classList.add("on"); if (state.fly.on) updateFly();
+  drawGps(); $("gps-btn-label").textContent = "GPS ON"; $("btn-my-gps").classList.add("on"); if (state.fly.on) { onFlyFix(); updateFly(); if (!state.fly.min) drawFlyDynamic(); }
 }
 function drawGps() {
   const g = state.gps; if (!g) return; L_gps.clearLayers(); const moving = g.gs > 5;
   if (g.acc && g.acc < 5000) L.circle([g.lat, g.lon], { radius: g.acc, color: "#38bdf8", weight: 1, fillOpacity: .08 }).addTo(L_gps);
-  const html = moving ? `<svg viewBox="0 0 32 32" width="30" height="30" style="transform:rotate(${Math.round(g.trk)}deg);filter:drop-shadow(0 0 4px rgba(56,189,248,.9))"><line x1="4" y1="6" x2="28" y2="20" stroke="#e2e8f0" stroke-width="1.8"/><line x1="28" y1="6" x2="4" y2="20" stroke="#e2e8f0" stroke-width="1.8"/><path d="M16 4C19 4 20.5 8 20.5 13C20.5 16.5 18.5 18.5 17 19.5L17 27L20 28.5L20 30L12 30L12 28.5L15 27L15 19.5C13.5 18.5 11.5 16.5 11.5 13C11.5 8 13 4 16 4Z" fill="#22c55e" stroke="#fff" stroke-width="1.3"/><ellipse cx="16" cy="9.5" rx="2.6" ry="3.2" fill="#38bdf8"/></svg>`
-    : `<span style="display:block;width:14px;height:14px;border-radius:999px;background:#0ea5e9;border:2px solid #fff;box-shadow:0 0 8px #0ea5e9"></span>`;
-  L.marker([g.lat, g.lon], { zIndexOffset: 900, icon: L.divIcon({ className: "", html, iconSize: moving ? [30, 30] : [14, 14], iconAnchor: moving ? [15, 15] : [7, 7] }) })
+  L.marker([g.lat, g.lon], { zIndexOffset: 900, icon: ownIcon(g, 44) })
     .bindPopup(`<div class="text-xs space-y-1"><b>ตำแหน่ง GPS</b><div class="mono text-cyan-300">${fmtLL(g.lat, g.lon)}</div><div class="mono">GS ${Math.round(g.gs)} kt • TRK ${pad3(toMag(g.trk))}°M${g.alt != null ? ` • ${fmt(g.alt)} ft` : ""}</div><button onclick="addLL(${g.lat},${g.lon},'MY-POS')" class="btn btn-sm w-full">+ ใช้เป็นจุดในเส้นทาง</button></div>`).addTo(L_gps);
 }
 let gpsWatch = null;
@@ -1153,53 +1151,150 @@ $("btn-my-gps").onclick = () => state.gps ? map.flyTo([state.gps.lat, state.gps.
 // 12. FLY MODE
 // =========================================================================
 function saveFly() { LS.set(K.fly, { target: state.fly.target, takeoff: state.fly.takeoff, landed: state.fly.landed }); }
-function fillFlyWp() { $("fly-wp").innerHTML = state.route.map((w, i) => i ? `<option value="${i}">→ ${i + 1}. ${esc(w.id)}</option>` : "").join(""); state.fly.target = Math.min(Math.max(1, state.fly.target), Math.max(1, state.route.length - 1)); $("fly-wp").value = state.fly.target; }
+function fillFlyWp() { $("fly-wp").innerHTML = state.route.map((w, i) => i ? `<option value="${i}">${i + 1}. ${esc(w.id)}</option>` : "").join(""); state.fly.target = Math.min(Math.max(1, state.fly.target), Math.max(1, state.route.length - 1)); $("fly-wp").value = state.fly.target; }
 async function setWake(on) { try { if (on && "wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen"); else if (wakeLock) { await wakeLock.release(); wakeLock = null; } } catch (_) {} }
+
+// ---- ownship symbol: top-view helicopter rotated to track (dot when stationary) ----
+const HELI_SVG = (sz, rot) => `<svg class="own-heli" viewBox="0 0 64 64" width="${sz}" height="${sz}" style="transform:rotate(${Math.round(rot)}deg)">
+  <circle cx="32" cy="26" r="22" fill="rgba(56,189,248,.14)" stroke="rgba(226,232,240,.55)" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <line x1="12" y1="12" x2="52" y2="40" stroke="#e2e8f0" stroke-width="2.4" stroke-linecap="round"/><line x1="52" y1="12" x2="12" y2="40" stroke="#e2e8f0" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M32 8c6 0 9 7 9 16 0 7-3 11-6 13v14l5 3v3H24v-3l5-3V37c-3-2-6-6-6-13 0-9 3-16 9-16z" fill="#fbbf24" stroke="#1a1205" stroke-width="1.6"/>
+  <ellipse cx="32" cy="17" rx="4.6" ry="5.8" fill="#38bdf8" stroke="#0c4a6e" stroke-width="1"/>
+  <rect x="25" y="52" width="14" height="3" rx="1.5" fill="#e2e8f0"/><circle cx="32" cy="26" r="2.2" fill="#1a1205"/></svg>`;
+const ownIcon = (g, sz = 56) => g && g.gs > 3
+  ? L.divIcon({ className: "", html: HELI_SVG(sz, g.trk || 0), iconSize: [sz, sz], iconAnchor: [sz / 2, sz * 26 / 64] })
+  : L.divIcon({ className: "", html: `<div class="own-dot"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
+
+// ---- moving map ----
+const FM = { map: null, base: null, baseKey: null, layers: {}, own: null, acc: null, follow: true, trail: [], lastRouteKey: "" };
+const FLY_BASES = ["sat", "esri", "topo", "dark"];
+function cloneBase(k) { const l = BASEMAPS[k].l; return l.getLayers ? L.layerGroup(l.getLayers().map(c => L.tileLayer(c._url, c.options))) : L.tileLayer(l._url, l.options); }
+function setFlyBase(k) {
+  if (!FM.map) return; if (FM.base) FM.map.removeLayer(FM.base);
+  FM.baseKey = k; FM.base = cloneBase(k).addTo(FM.map); (FM.base.getLayers ? FM.base.getLayers().slice().reverse() : [FM.base]).forEach(l => l.bringToBack());
+}
+function initFlyMap() {
+  if (FM.map) return;
+  FM.map = L.map("fly-map", { zoomControl: false, attributionControl: true, worldCopyJump: true, zoomSnap: .5, inertia: true }).setView([13.75, 100.5], 10);
+  FM.map.attributionControl.setPrefix(false);
+  FM.map.createPane("fmRoute").style.zIndex = 640; FM.map.createPane("fmOwn").style.zIndex = 700;
+  ["notam", "ap", "route", "wp", "trail", "own"].forEach(k => FM.layers[k] = L.layerGroup().addTo(FM.map));
+  setFlyBase(FLY_BASES.includes(S.basemap) ? S.basemap : "sat");
+  FM.map.on("dragstart", () => setFollow(false));
+  FM.map.on("zoomend moveend", flyRange);
+}
+function setFollow(on) { FM.follow = on; $("fm-follow").classList.toggle("on", on); if (on) centerFly(true); }
+function centerFly(force) {
+  const g = state.gps; if (!FM.map) return;
+  if (g && (FM.follow || force)) { const z = FM.map.getZoom(); FM.map.setView([g.lat, g.lon], z, { animate: !force }); }
+}
+function flyRange() { if (!FM.map) return; const b = FM.map.getBounds(), c = b.getCenter(); $("fm-range").textContent = `↔ ${Math.round(distNM(c.lat, b.getWest(), c.lat, b.getEast()))} NM`; }
+function drawFlyStatic() {
+  if (!FM.map) return; const r = state.route, t = state.fly.target;
+  ["route", "wp", "ap", "notam"].forEach(k => FM.layers[k].clearLayers());
+  L.polyline(r.map(w => [w.lat, w.lon]), { pane: "fmRoute", color: "#f5a524", weight: 4, opacity: .55 }).addTo(FM.layers.route);
+  if (r[t - 1] && r[t]) L.polyline([[r[t - 1].lat, r[t - 1].lon], [r[t].lat, r[t].lon]], { pane: "fmRoute", color: "#e879f9", weight: 6, opacity: .95 }).addTo(FM.layers.route);
+  r.forEach((w, i) => L.marker([w.lat, w.lon], { pane: "fmRoute", icon: L.divIcon({ className: "", html: `<div style="display:flex;align-items:center;gap:3px;transform:translate(-7px,-7px)"><span style="width:14px;height:14px;border-radius:99px;background:${i === t ? "#e879f9" : i < t ? "#64748b" : "#f5a524"};border:2px solid #fff;flex:none"></span><span class="fwp ${i === t ? "tgt" : ""}">${esc(w.id)}</span></div>`, iconSize: [14, 14], iconAnchor: [7, 7] }) }).addTo(FM.layers.wp));
+  AIRPORTS.forEach(ap => { const fc = flightCat(ap.icao), bg = fc.src === "METAR" ? (fc.imc ? "#ef4444" : "#22c55e") : "#64748b";
+    L.marker([ap.lat, ap.lon], { icon: L.divIcon({ className: "", html: `<div class="ap-badge" style="width:36px;height:18px;font-size:9.5px;background:${bg};color:${fc.src === "METAR" && !fc.imc ? "#060a13" : "#fff"}">${ap.icao}</div>`, iconSize: [36, 18], iconAnchor: [18, 9] }) }).addTo(FM.layers.ap); });
+  const now = new Date();
+  state.notams.forEach(n => { const v = notamValidity(n); if (v && (v.from > new Date(now.getTime() + 6 * 3600e3))) return; const g = notamGeom(n); if (!g) return; const st = SEV[n.severity] || SEV.info;
+    const o = { color: st.s, weight: 1.4, dashArray: "5,4", fillColor: st.s, fillOpacity: st.op, interactive: false };
+    if (g.type === "poly") L.polygon(g.pts, o).addTo(FM.layers.notam); else if (g.type === "line") g.pts.forEach(p => L.circle(p, { ...o, radius: g.r * 1852 }).addTo(FM.layers.notam)); else L.circle(g.center, { ...o, radius: Math.max(.05, g.r) * 1852 }).addTo(FM.layers.notam); });
+  FM.lastRouteKey = routeKey() + "|" + t;
+}
+function drawFlyDynamic() {
+  if (!FM.map) return; const g = state.gps, r = state.route, tgt = r[state.fly.target];
+  FM.layers.own.clearLayers(); FM.layers.trail.clearLayers();
+  if (FM.trail.length > 1) L.polyline(FM.trail, { color: "#22d3ee", weight: 3, opacity: .8, interactive: false }).addTo(FM.layers.trail);
+  if (!g) return;
+  if (g.acc && g.acc < 2000) L.circle([g.lat, g.lon], { pane: "fmOwn", radius: g.acc, color: "#38bdf8", weight: 1, fillOpacity: .06, interactive: false }).addTo(FM.layers.own);
+  if (tgt) L.polyline([[g.lat, g.lon], [tgt.lat, tgt.lon]], { pane: "fmRoute", color: "#22c55e", weight: 2.5, dashArray: "8,6", interactive: false }).addTo(FM.layers.own);
+  if (g.gs > 3) { const dNm = g.gs * 5 / 60, R = 3440.065, b = toRad(g.trk), la1 = toRad(g.lat), lo1 = toRad(g.lon), dr = dNm / R;   // 5-minute track vector
+    const la2 = Math.asin(Math.sin(la1) * Math.cos(dr) + Math.cos(la1) * Math.sin(dr) * Math.cos(b)), lo2 = lo1 + Math.atan2(Math.sin(b) * Math.sin(dr) * Math.cos(la1), Math.cos(dr) - Math.sin(la1) * Math.sin(la2));
+    L.polyline([[g.lat, g.lon], [toDeg(la2), toDeg(lo2)]], { pane: "fmOwn", color: "#fff", weight: 2.5, opacity: .9, interactive: false }).addTo(FM.layers.own); }
+  L.marker([g.lat, g.lon], { pane: "fmOwn", icon: ownIcon(g), interactive: false }).addTo(FM.layers.own);
+  centerFly(false);
+}
+function onFlyFix() {
+  const g = state.gps; if (!g || !state.fly.on) return;
+  const last = FM.trail[FM.trail.length - 1];
+  if (!last || distNM(last[0], last[1], g.lat, g.lon) > .03) { FM.trail.push([g.lat, g.lon]); if (FM.trail.length > 4000) FM.trail.shift(); }
+}
+
 function openFly() {
   if (state.route.length < 2) return toast("วางแผนเส้นทางอย่างน้อย 2 จุดก่อนเข้าโหมดบิน");
   state.fly.on = true; state.fly.min = false; fillFlyWp(); $("fly-overlay").classList.remove("hidden"); $("fly-strip").classList.add("hidden");
-  startGps(false); setWake(true); renderRoute(); updateFly();
+  initFlyMap(); setTimeout(() => {
+    FM.map.invalidateSize(); drawFlyStatic();
+    if (state.gps) { FM.map.setView([state.gps.lat, state.gps.lon], 11); setFollow(true); }
+    else { FM.map.fitBounds(L.latLngBounds(state.route.map(w => [w.lat, w.lon])), { padding: [40, 40] }); FM.follow = true; }
+    drawFlyDynamic(); flyRange();
+  }, 30);
+  startGps(false); setWake(true); renderRoute(); updateFly(); lucide.createIcons();
 }
 function closeFly() { state.fly.on = false; $("fly-overlay").classList.add("hidden"); $("fly-strip").classList.add("hidden"); document.body.classList.remove("night-dim"); setWake(false); renderRoute(); }
-$("btn-fly").onclick = openFly; $("fly-exit").onclick = closeFly;
+$("btn-fly").onclick = openFly; $("fly-exit").onclick = () => { if (state.fly.takeoff && !state.fly.landed && !confirm("ยังไม่ได้กด Landing — ออกจากโหมดบิน?")) return; closeFly(); };
 $("fly-min").onclick = () => { state.fly.min = true; $("fly-overlay").classList.add("hidden"); $("fly-strip").classList.remove("hidden"); if (!isLg()) setSheet("peek"); setTimeout(() => { map.invalidateSize(); if (state.gps) map.setView([state.gps.lat, state.gps.lon], Math.max(map.getZoom(), 11)); }, 50); };
-$("fs-expand").onclick = () => { state.fly.min = false; $("fly-overlay").classList.remove("hidden"); $("fly-strip").classList.add("hidden"); };
-$("fly-night").onclick = () => document.body.classList.toggle("night-dim");
-$("fly-wp").onchange = e => { state.fly.target = +e.target.value; saveFly(); renderRoute(); };
-$("fly-prev").onclick = () => { if (state.fly.target > 1) { state.fly.target--; saveFly(); fillFlyWp(); renderRoute(); } };
-$("fly-next").onclick = () => { if (state.fly.target < state.route.length - 1) { state.fly.target++; saveFly(); fillFlyWp(); renderRoute(); } };
+$("fs-expand").onclick = () => { state.fly.min = false; $("fly-overlay").classList.remove("hidden"); $("fly-strip").classList.add("hidden"); setTimeout(() => { FM.map && FM.map.invalidateSize(); drawFlyStatic(); drawFlyDynamic(); }, 30); };
+$("fly-night").onclick = () => { document.body.classList.toggle("night-dim"); $("fly-night").classList.toggle("on", document.body.classList.contains("night-dim")); };
+const flyTarget = i => { state.fly.target = i; saveFly(); fillFlyWp(); renderRoute(); drawFlyStatic(); updateFly(); };
+$("fly-wp").onchange = e => flyTarget(+e.target.value);
+$("fly-prev").onclick = () => { if (state.fly.target > 1) flyTarget(state.fly.target - 1); };
+$("fly-next").onclick = () => { if (state.fly.target < state.route.length - 1) flyTarget(state.fly.target + 1); };
+$("fm-zin").onclick = () => FM.map && FM.map.zoomIn(1);
+$("fm-zout").onclick = () => FM.map && FM.map.zoomOut(1);
+$("fm-follow").onclick = () => { if (!state.gps) return toast("ยังไม่มีสัญญาณ GPS"); setFollow(true); };
+$("fm-base").onclick = () => { const k = FLY_BASES[(FLY_BASES.indexOf(FM.baseKey) + 1) % FLY_BASES.length]; setFlyBase(k); toast(`แผนที่: ${BASEMAPS[k].n}`); };
 $("fly-takeoff").onclick = () => {
-  if (!state.fly.takeoff || state.fly.landed) { state.fly.takeoff = Date.now(); state.fly.landed = null; state.fly.target = 1; fillFlyWp(); toast(`Takeoff ${utc(new Date())}`); }
+  if (!state.fly.takeoff || state.fly.landed) { state.fly.takeoff = Date.now(); state.fly.landed = null; FM.trail = []; if (state.fly.target < 1) state.fly.target = 1; fillFlyWp(); toast(`Takeoff ${utc(new Date())}`); }
   else { state.fly.landed = Date.now(); toast(`Landing ${utc(new Date())} • เวลาบิน ${hhmm((state.fly.landed - state.fly.takeoff) / 3600e3)}`); }
   saveFly(); updateFly();
 };
+function alongTrackNM(p, a, b) { const d13 = distNM(a.lat, a.lon, p.lat, p.lon) / 3440.065, x = xteNM(p, a, b) / 3440.065; return Math.acos(Math.max(-1, Math.min(1, Math.cos(d13) / Math.cos(x)))) * 3440.065 * (Math.cos(toRad(brgT(a.lat, a.lon, p.lat, p.lon) - brgT(a.lat, a.lon, b.lat, b.lon))) < 0 ? -1 : 1); }
 function updateFly() {
   const r = state.route, f = state.fly, g = state.gps, tgt = r[f.target], prev = r[f.target - 1], leg = state.legs[f.target - 1], dest = r[r.length - 1];
   const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
-  const tko = f.takeoff, end = f.landed || Date.now(), elapsedH = tko ? (end - tko) / 3600e3 : 0;
-  set("fly-timer", tko ? new Date(end - tko).toISOString().slice(11, 19) : "00:00:00");
-  $("fly-takeoff").textContent = !tko || f.landed ? "Takeoff" : "Landing"; $("fly-takeoff").className = `btn ${!tko || f.landed ? "btn-go" : "btn-amber"}`;
-  const fuelRem = tko ? num(S.fob) - num(S.taxi) - num(S.burn) * elapsedH : num(S.fob);
-  set("t-fuel", num(S.fob) ? fmt(fuelRem) : "--"); set("t-fuel-s", num(S.burn) > 0 ? `lbs • endurance ${hhmm(Math.max(0, fuelRem) / num(S.burn))}` : "lbs");
-  $("t-fuel").style.color = num(S.burn) > 0 && fuelRem / num(S.burn) * 60 < num(S.res) + 10 ? "#ef4444" : "";
+  if (FM.map && f.on && !f.min && FM.lastRouteKey !== routeKey() + "|" + f.target) drawFlyStatic();
+  const tko = f.takeoff, end = f.landed || Date.now(), elapsedH = tko ? (end - tko) / 3600e3 : 0, flt = tko ? new Date(end - tko).toISOString().slice(11, 19) : "00:00:00";
+  set("fly-timer", flt); set("t-flt", flt); set("t-clock", `${ict(new Date())} ICT • ${utc(new Date())}`);
+  $("fly-takeoff").textContent = !tko || f.landed ? "Takeoff" : "Landing"; $("fly-takeoff").className = `btn !min-h-[40px] !px-3 ${!tko || f.landed ? "btn-go" : "btn-amber"}`;
+  // fuel
+  const burn = num(S.burn), fob = num(S.fob), fuelRem = tko ? fob - num(S.taxi) - burn * elapsedH : fob, resLb = burn * num(S.res) / 60;
+  set("t-fuel", fob ? fmt(fuelRem) : "--"); set("t-fuel-s", burn > 0 ? `lbs • endurance ${hhmm(Math.max(0, fuelRem) / burn)} • reserve ${fmt(resLb)}` : "lbs");
+  $("t-fuel").style.color = burn > 0 && fuelRem < resLb + burn / 6 ? "#ef4444" : ""; $("t-fuel-bar").style.width = num(S.cap) > 0 ? Math.max(0, Math.min(100, fuelRem / num(S.cap) * 100)) + "%" : "0";
+  $("t-fuel-bar").style.background = burn > 0 && fuelRem < resLb + burn / 6 ? "#ef4444" : "#38bdf8";
   set("t-wpname", tgt ? tgt.id : ""); set("t-destname", dest ? dest.id : "");
-  set("t-mh", leg ? pad3(leg.mh) + "°" : "--"); set("t-mh-s", leg ? `TC ${pad3(leg.tc)} • WCA ${leg.wca >= 0 ? "+" : ""}${leg.wca.toFixed(0)}°` : "--");
-  set("t-msa", leg && leg.msa ? fmt(leg.msa) : "--");
+  set("t-mh", leg ? pad3(leg.mh) + "°" : "--"); set("t-mh-s", leg ? `TC ${pad3(leg.tc)}° • WCA ${leg.wca >= 0 ? "+" : ""}${leg.wca.toFixed(0)}°` : "--");
+  set("t-msa", leg && leg.msa ? fmt(leg.msa) : "--"); set("t-dtk", leg ? pad3(leg.mc) + "°" : "---");
+  const nl = state.legs[f.target]; set("t-nxt", nl ? `${pad3(nl.mh)}°` : "—"); set("t-nxt-s", nl ? `${esc(nl.b.id)} • ${nl.dist.toFixed(1)} NM • ${hhmm(nl.h)}` : "จุดสุดท้าย");
   const dap = dest && AIRPORTS.find(a => a.icao === dest.id);
   $("t-freq").innerHTML = dap ? Object.entries(dap.atc).map(([k, v]) => `<span class="mr-3"><span class="text-slate-400">${k}</span> ${esc(v)}</span>`).join("") + dap.ils.map(l => `<span class="mr-3 text-fuchsia-300"><span class="text-slate-400">ILS ${esc(l.rwy)}</span> ${esc(l.freq || "AIP")}</span>`).join("") : "—";
-  if (!g) { $("fly-gps").className = "pill pill-warn"; $("fly-gps").textContent = "รอ GPS"; ["t-dist", "t-brg", "t-ete", "t-gs", "t-xte", "t-alt", "t-ddist"].forEach(id => set(id, "--")); return; }
-  const age = (Date.now() - g.t) / 1000; $("fly-gps").className = `pill ${age < 10 && g.acc < 100 ? "pill-go" : "pill-warn"}`; $("fly-gps").textContent = `GPS ±${Math.round(g.acc)}m${age > 10 ? " (เก่า)" : ""}`;
-  set("t-gs", Math.round(g.gs)); set("t-alt", g.alt != null ? fmt(g.alt) : "--");
+  // daylight
+  if (dest) { const st = sunTimes(new Date(), dest.lat, dest.lon, 90.833), m = st.set ? (st.set - Date.now()) / 6e4 : null; set("t-sun", m == null ? "--" : m > 0 ? hhmm(m / 60) : "หลังตะวันตก"); set("t-sun-s", st.set ? `ตก ${ict(st.set)} ICT ที่ ${dest.id}` : "--"); $("t-sun").style.color = m != null && m < 30 ? "#ef4444" : ""; }
+  $("fly-nogps").style.display = g ? "none" : "";
+  if (!g) { $("fly-gps").className = "pill pill-warn !text-[10.5px] !py-1"; $("fly-gps").textContent = "รอ GPS"; ["t-dist", "t-brg", "t-ete", "t-gs", "t-xte", "t-alt", "t-ddist", "t-trk", "t-fdest"].forEach(id => set(id, "--")); set("t-eta", "ETA --"); return; }
+  const age = (Date.now() - g.t) / 1000; $("fly-gps").className = `pill ${age < 10 && g.acc < 100 ? "pill-go" : "pill-warn"} !text-[10.5px] !py-1`; $("fly-gps").textContent = `GPS ±${Math.round(g.acc)}m${age > 10 ? " เก่า" : ""}`;
+  set("t-gs", Math.round(g.gs)); set("t-alt", g.alt != null ? fmt(g.alt) : "--"); set("t-trk", g.gs > 3 ? pad3(toMag(g.trk)) + "°" : "---");
   if (!tgt) return;
   const d = distNM(g.lat, g.lon, tgt.lat, tgt.lon), b = toMag(brgT(g.lat, g.lon, tgt.lat, tgt.lon));
-  set("t-dist", d < 10 ? d.toFixed(1) : Math.round(d)); set("t-brg", pad3(b) + "°"); set("t-brg-s", `TRK ${pad3(toMag(g.trk))}°M`);
+  set("t-dist", d < 10 ? d.toFixed(1) : Math.round(d)); set("t-brg", pad3(b) + "°");
   const gs = g.gs > 10 ? g.gs : (leg?.gs || num(S.tas));
-  set("t-ete", gs > 0 ? hhmm(d / gs) : "--"); set("t-eta", gs > 0 ? `ETA ${ict(new Date(Date.now() + d / gs * 3600e3))} • ${utc(new Date(Date.now() + d / gs * 3600e3))}` : "ETA --");
-  if (prev) { const x = xteNM(g, prev, tgt); set("t-xte", Math.abs(x).toFixed(1)); set("t-xte-s", Math.abs(x) < .05 ? "NM on track" : `NM ${x > 0 ? "ขวาของเส้น (R)" : "ซ้ายของเส้น (L)"}`); $("t-xte").style.color = Math.abs(x) > 2 ? "#f5a524" : ""; }
+  set("t-ete", gs > 0 ? hhmm(d / gs) : "--"); set("t-eta", gs > 0 ? `ETA ${ict(new Date(Date.now() + d / gs * 3600e3))}` : "ETA --");
+  if (prev) {
+    const x = xteNM(g, prev, tgt), ax = Math.abs(x), dots = Math.max(-1, Math.min(1, x / 2));
+    $("cdi-needle").style.left = `${50 - dots * 48}%`;   // needle shows where the course is: right of track → course line to the left
+    set("t-xte", ax < .05 ? "ON COURSE" : `${ax.toFixed(ax < 10 ? 2 : 0)} NM ${x > 0 ? "R" : "L"}`);
+    set("t-xte-s", ax < .05 ? "ตรงแนวเส้นทาง" : `ออกนอกแนว — เลี้ยว${x > 0 ? "ซ้าย" : "ขวา"}`);
+    $("t-xte-s").style.color = ax > 1 ? "#f5a524" : "";
+  }
   let rem = d; for (let i = f.target; i < r.length - 1; i++) rem += distNM(r[i].lat, r[i].lon, r[i + 1].lat, r[i + 1].lon);
-  set("t-ddist", rem.toFixed(rem < 10 ? 1 : 0)); set("t-deta", gs > 0 ? `NM • ETA ${ict(new Date(Date.now() + rem / gs * 3600e3))}` : "NM");
+  set("t-ddist", rem.toFixed(rem < 10 ? 1 : 0)); set("t-deta", gs > 0 ? `NM • ETE ${hhmm(rem / gs)} • ETA ${ict(new Date(Date.now() + rem / gs * 3600e3))}` : "NM");
+  if (burn > 0 && fob > 0 && gs > 0) { const fd = fuelRem - burn * rem / gs; set("t-fdest", fmt(fd)); set("t-fdest-s", fd < resLb ? `lbs • ต่ำกว่า reserve ${fmt(resLb)}` : `lbs • เหนือ reserve ${fmt(fd - resLb)}`); $("t-fdest").style.color = fd < resLb ? "#ef4444" : fd < resLb + burn / 6 ? "#f5a524" : "#22c55e"; }
   set("fs-wp", `→ ${tgt.id}`); set("fs-dist", d.toFixed(1)); set("fs-brg", pad3(b) + "°"); set("fs-ete", gs > 0 ? hhmm(d / gs) : "--"); set("fs-gs", Math.round(g.gs));
-  if (d < 0.5 && f.target < r.length - 1 && !f._seq) { f._seq = true; f.target++; saveFly(); fillFlyWp(); toast(`ผ่าน ${tgt.id} → มุ่งหน้า ${r[f.target].id}`); renderRoute(); setTimeout(() => f._seq = false, 4000); }
+  // auto-sequence: within 0.5 NM, or passed abeam the target (along-track beyond the leg) within 2 NM
+  const passed = prev && d < 2 && alongTrackNM(g, prev, tgt) > distNM(prev.lat, prev.lon, tgt.lat, tgt.lon);
+  if ((d < .5 || passed) && f.target < r.length - 1 && !f._seq) { f._seq = true; const from = tgt.id; flyTarget(f.target + 1); toast(`ผ่าน ${from} → มุ่งหน้า ${r[f.target].id}`); if (navigator.vibrate) navigator.vibrate(200); setTimeout(() => f._seq = false, 4000); }
 }
 setInterval(() => { if (state.fly.on) updateFly(); }, 1000);
 
@@ -1221,7 +1316,7 @@ $("btn-clear-pad").onclick = () => { PAD.forEach(id => $(id).value = ""); LS.set
 // =========================================================================
 // 14. PRINT FLIGHT LOG
 // =========================================================================
-function printLog() {
+function printLog(withBrief) {
   if (state.route.length < 2) return toast("ต้องมีเส้นทางอย่างน้อย 2 จุด");
   const fp = fuelPlan(), w = weightCalc(), T = state.totals, etd = getEtd(), hits = routeNotamHits().filter(h => h.active).slice(0, 10);
   const end = state.route[state.route.length - 1], sun = sunTimes(etd, end.lat, end.lon, 90.833);
@@ -1239,14 +1334,52 @@ function printLog() {
     <div style="${h3}">NAVIGATION LOG</div><table style="width:100%;border-collapse:collapse"><thead><tr>${["#", "FROM → TO", "TC", "MH", "NM", "GS", "ETE", "ETA", "FUEL", "REM", "MSA", "ATA", "NOTES"].map(x => `<th style="${th}">${x}</th>`).join("")}</tr></thead><tbody>${legRows}</tbody></table>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div style="${h3}">FUEL PLAN (lbs)</div><table style="width:100%;border-collapse:collapse">${[["Start/Taxi", fp.taxi], ["Trip", fp.trip], [`Contingency ${num(S.cont)}%`, fp.cont], [`Alternate ${esc(S.altn || "—")}`, fp.altn], [`Final reserve ${num(S.res)} min`, fp.reserve], ["Extra", fp.extra], ["REQUIRED", fp.req], ["FOB", fp.fob], ["MARGIN", fp.margin]].map(([k, v]) => `<tr><td style="${td};font-family:sans-serif">${k}</td><td style="${td};text-align:right;font-weight:${k === "REQUIRED" || k === "MARGIN" ? 800 : 400};color:${k === "MARGIN" && v < 0 ? "#dc2626" : "inherit"}">${fmt(v)}</td></tr>`).join("")}</table></div>
     <div><div style="${h3}">ATIS / CLEARANCE</div><div style="border:1px solid #cbd5e1;min-height:110px;padding:6px;font-family:monospace;white-space:pre-wrap">ATIS ${esc($("pad-atis").value)}  WIND ${esc($("pad-wind").value)}  QNH ${esc($("pad-qnh").value)}  SQ ${esc($("pad-sq").value)}\n${esc($("pad-notes").value)}</div></div></div>
-    ${wxRows ? `<div style="${h3}">WEATHER (METAR / TAF — AviationWeather.gov)</div>${wxRows}` : ""}
+    ${wxRows ? `<div style="${h3}">WEATHER (METAR — NOAA via metar.vatsim.net)</div>${wxRows}` : ""}
     <div style="${h3}">WAYPOINTS & FREQUENCIES</div><table style="width:100%;border-collapse:collapse"><thead><tr>${["#", "IDENT", "COORDINATES", "ELEV", "VOR FIX", "ATS FREQ"].map(x => `<th style="${th}">${x}</th>`).join("")}</tr></thead><tbody>${wpRows}</tbody></table>
     ${sc ? `<div style="${h3}">OBSTACLES ON ROUTE (OpenStreetMap)</div><div style="font-size:10px">Power lines crossing: ${sc.power.length} • Masts/towers within 1 km: ${sc.obst.length}${sc.tall.length ? ` • ≥300 ft AGL: ${sc.tall.map(o => `${esc(o.name)} ${fmt(o.hft)} ft (leg ${o.leg + 1})`).join(", ")}` : ""}</div>` : ""}
     ${hits.length ? `<div style="${h3}">NOTAM ON/NEAR ROUTE (active during flight)</div>${hits.map(h => `<div style="border:1px solid #cbd5e1;border-radius:4px;padding:3px 6px;margin-bottom:3px;font-size:10px"><b>${esc(h.n.id)} ${esc(h.n.icao)}</b> ${h.inside ? "[CROSSES ROUTE]" : `[${h.dist.toFixed(1)} NM]`} ${esc(h.n.title)} — ${esc(h.n.valid)}</div>`).join("")}` : ""}
-    <div style="margin-top:14px;display:flex;justify-content:space-between;font-size:9px;color:#64748b;border-top:1px solid #cbd5e1;padding-top:6px"><span>THAI HELI-VFR EFB — planning aid only; verify with official AIP/NOTAM/MET and RFM</span><span>PIC ____________________ Sign ____________________</span></div></div>`;
-  setTimeout(() => window.print(), 150);
+    ${withBrief && state.briefItems ? `<div style="${h3}">GO / NO-GO BRIEFING</div>${state.briefItems.map(i => `<div style="display:flex;gap:6px;border-bottom:1px solid #e2e8f0;padding:3px 0;font-size:10.5px"><b style="width:58px;flex:none;color:${{ go: "#047857", warn: "#b45309", stop: "#dc2626", info: "#0369a1" }[i.st]}">${{ go: "GO", warn: "CHECK", stop: "NO-GO", info: "INFO" }[i.st]}</b><span><b>${esc(i.t)}</b> — ${esc(i.d)}</span></div>`).join("")}<div style="${h3}">PRE-FLIGHT CHECKLIST</div><div style="display:grid;grid-template-columns:1fr 1fr;column-gap:12px;font-size:10px">${CHECKLIST_ITEMS.map((t, k) => `<div style="break-inside:avoid;padding:4px 0;line-height:1.45">${(LS.get(K.check, {})[k] ? "☑" : "☐")} ${esc(t)}</div>`).join("")}</div>` : ""}
+    <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;font-size:9px;line-height:1.6;color:#64748b;border-top:1px solid #cbd5e1;padding:6px 0 10px"><span>THAI HELI-VFR EFB — planning aid only; verify with official AIP/NOTAM/MET and RFM</span><span>PIC ____________________ Sign ____________________</span></div></div>`;
+  return exportLogPdf(withBrief);
 }
-$("btn-print").onclick = printLog; $("btn-print2").onclick = printLog;
+const loadScript = src => new Promise((res, rej) => { if (document.querySelector(`script[data-lib="${src}"]`)) return res(); const el = document.createElement("script"); el.src = src; el.dataset.lib = src; el.onload = res; el.onerror = () => { el.remove(); rej(new Error(navigator.onLine ? "โหลดตัวสร้าง PDF ไม่สำเร็จ" : "ครั้งแรกต้องต่ออินเทอร์เน็ตเพื่อโหลดตัวสร้าง PDF")); }; document.head.appendChild(el); });
+let pdfBusy = false;
+// Renders the flight log off-screen and paginates it to A4 at row boundaries. Works in installed
+// mobile apps, where window.print() is silently ignored.
+async function exportLogPdf(withBrief) {
+  if (pdfBusy) return; pdfBusy = true; toast("กำลังสร้าง PDF...");
+  const host = document.createElement("div");
+  try {
+    await loadScript("./vendor/pdfgen/html2canvas.min.js"); await loadScript("./vendor/pdfgen/jspdf.umd.min.js");
+    const W = 794, PAD = 30, PAGE = Math.floor(W * 841.89 / 595.28);   // A4 at 96 dpi
+    host.style.cssText = `position:fixed;left:-12000px;top:0;width:${W - 2 * PAD}px;background:#fff`;
+    host.innerHTML = $("print-flight-log").innerHTML; document.body.appendChild(host);
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    // Render each section on its own (html2canvas text metrics drift slightly from the DOM, so one
+    // tall capture can't be cut reliably), then stack sections onto A4 pages keeping DOM spacing.
+    const root = host.firstElementChild, blocks = [...root.children], rootTop = root.getBoundingClientRect().top;
+    const parts = [];
+    for (const el of blocks) { const r = el.getBoundingClientRect(); parts.push({ top: r.top - rootTop, h: r.height, head: /border-bottom:2px solid/.test(el.getAttribute("style") || "") && !el.children.length, cv: await html2canvas(el, { scale: 2, backgroundColor: "#ffffff", logging: false }) }); }
+    const pdf = new jspdf.jsPDF({ unit: "pt", format: "a4", compress: true }), pw = 595.28, k = pw / W, avail = PAGE - 2 * PAD - 24;
+    let page = 0, pageTop = 0;
+    const put = (cv, sy, sh, y) => { const c = document.createElement("canvas"); c.width = cv.width; c.height = Math.max(1, Math.round(sh * 2)); c.getContext("2d").drawImage(cv, 0, Math.round(sy * 2), cv.width, c.height, 0, 0, cv.width, c.height); pdf.addImage(c.toDataURL("image/jpeg", .92), "JPEG", PAD * k, (PAD + y) * k, (W - 2 * PAD) * k, sh * k); };
+    const newPage = top => { pdf.addPage(); page++; pageTop = top; };
+    parts.forEach((pt, i) => {
+      let y = pt.top - pageTop; const next = parts[i + 1];
+      const need = pt.head && next ? next.top + Math.min(next.h, 60) - pt.top : pt.h;   // keep a heading with the start of its section
+      if (y + need > avail && y > 0) { newPage(pt.top); y = 0; }
+      if (pt.h <= avail - y) { put(pt.cv, 0, pt.h, y); return; }
+      let sy = 0; while (sy < pt.h) { const room = avail - y, sh = Math.min(room, pt.h - sy); put(pt.cv, sy, sh, y); sy += sh; if (sy < pt.h) { newPage(pt.top + sy); y = 0; } }
+    });
+    const pages = pdf.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) { pdf.setPage(i); pdf.setFontSize(8); pdf.setTextColor(100); pdf.text(`THAI HELI-VFR EFB  •  ${state.route[0].id}-${state.route[state.route.length - 1].id}  •  Page ${i}/${pages}`, pw / 2, 828, { align: "center" }); }
+    const name = `FlightLog-${state.route[0].id}-${state.route[state.route.length - 1].id}-${stamp()}.pdf`.replace(/[^\w.-]+/g, "_");
+    await shareOrDownload(name, pdf.output("blob"), "application/pdf");
+    toast("สร้าง Flight Log PDF แล้ว ✓");
+  } catch (err) { toast("สร้าง PDF ไม่สำเร็จ: " + (err.message || err)); }
+  finally { host.remove(); pdfBusy = false; }
+}
+$("btn-print").onclick = () => printLog(false); $("btn-print2").onclick = () => printLog(true);
 
 // =========================================================================
 // 15. EXTERNAL LIVE DATA SOURCES

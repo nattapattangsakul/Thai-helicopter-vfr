@@ -1,5 +1,5 @@
 /* THAI HELI-VFR EFB — service worker (generated from scripts/sw.template.js by `npm run build`) */
-const VERSION = "1bb015f283";
+const VERSION = "e1cf374fc4";
 const SHELL = `thv-shell-${VERSION}`;
 const TILES = "thv-tiles-v1";      // basemap tiles (also filled by "ดาวน์โหลดแผนที่ออฟไลน์")
 const LIB = "thv-lib-v1";         // on-demand libraries (pdf.js for NOTAM import)
@@ -11,8 +11,8 @@ const PRECACHE = [
   "./index.html",
   "./manifest.webmanifest",
   "./css/fonts.css",
-  "./assets/app.0134cf643a.css",
-  "./assets/app.987845612a.js",
+  "./assets/app.641f84d632.css",
+  "./assets/app.d51aa9cd13.js",
   "./vendor/leaflet/images/layers-2x.png",
   "./vendor/leaflet/images/layers.png",
   "./vendor/leaflet/images/marker-icon-2x.png",
@@ -119,7 +119,7 @@ async function shellStrategy(e) {
   if (hit) return hit;
   const res = await fetch(req);
   // large on-demand libraries (pdf.js) are kept in a cache that survives app updates
-  if (res.ok && new URL(req.url).pathname.includes("/vendor/pdfjs/")) (await caches.open(LIB)).put(req, res.clone());
+  if (res.ok && new URL(req.url).pathname.match(/\/vendor\/(pdfjs|pdfgen)\//)) (await caches.open(LIB)).put(req, res.clone());
   return res;
 }
 

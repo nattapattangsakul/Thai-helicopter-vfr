@@ -27,6 +27,9 @@ copy(path.join(NM, "lucide/dist/umd/lucide.min.js"), r("vendor/lucide.min.js"));
 // pdf.js (legacy build for older iOS Safari) — loaded on demand by "นำเข้า NOTAM", cached at runtime, not precached
 copy(path.join(NM, "pdfjs-dist/legacy/build/pdf.min.mjs"), r("vendor/pdfjs/pdf.min.mjs"));
 copy(path.join(NM, "pdfjs-dist/legacy/build/pdf.worker.min.mjs"), r("vendor/pdfjs/pdf.worker.min.mjs"));
+// jsPDF + html2canvas — on-demand Flight Log PDF (window.print() does nothing in installed mobile apps)
+copy(path.join(NM, "jspdf/dist/jspdf.umd.min.js"), r("vendor/pdfgen/jspdf.umd.min.js"));
+copy(path.join(NM, "html2canvas/dist/html2canvas.min.js"), r("vendor/pdfgen/html2canvas.min.js"));
 log("vendor copied");
 
 // ---------- 2. self-hosted fonts ----------
@@ -97,7 +100,7 @@ log("assets:", Object.values(hashed).join(", "));
 const walk = d => fs.readdirSync(r(d), { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 const PRECACHE = [
   "index.html", "manifest.webmanifest", "css/fonts.css", hashed["css/app.css"], hashed["js/app.js"],
-  ...walk("vendor").filter(f => !f.includes("pdfjs")), ...walk("fonts"), ...walk("icons").filter(f => /\.(png|svg)$/.test(f) && !f.includes("screenshot"))
+  ...walk("vendor").filter(f => !/pdfjs|pdfgen/.test(f)), ...walk("fonts"), ...walk("icons").filter(f => /\.(png|svg)$/.test(f) && !f.includes("screenshot"))
 ].map(f => f.split(path.sep).join("/")).filter(f => !f.endsWith(".map"));
 const hash = createHash("sha256");
 for (const f of PRECACHE) {

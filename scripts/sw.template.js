@@ -84,7 +84,7 @@ async function shellStrategy(e) {
   if (hit) return hit;
   const res = await fetch(req);
   // large on-demand libraries (pdf.js) are kept in a cache that survives app updates
-  if (res.ok && new URL(req.url).pathname.includes("/vendor/pdfjs/")) (await caches.open(LIB)).put(req, res.clone());
+  if (res.ok && new URL(req.url).pathname.match(/\/vendor\/(pdfjs|pdfgen)\//)) (await caches.open(LIB)).put(req, res.clone());
   return res;
 }
 
