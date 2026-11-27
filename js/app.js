@@ -1975,7 +1975,7 @@ $("btn-notam-reset").onclick = () => {
 // The app has no server, so this protects access on the device: the app opens to a sign-in
 // screen and re-locks after being in the background. Never locks while FLY mode is open.
 // =========================================================================
-const LOCK = { cfg: LS.get(K.lock, null), pin: "", fails: 0, until: 0, hiddenAt: 0 };
+const LOCK = { cfg: LS.get(K.lock, null), pin: "", fails: 0, until: 0, hiddenAt: 0, mode: "unlock", first: "" };
 const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
 const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 async function pinHash(pin, salt) {
@@ -1985,13 +1985,43 @@ async function pinHash(pin, salt) {
 const isLocked = () => document.documentElement.classList.contains("locked");
 const bioAvailable = async () => { try { return !!(window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); } catch (_) { return false; } };
 function lockDots() { $("lock-dots").innerHTML = Array.from({ length: Math.max(4, LOCK.pin.length) }, (_, i) => `<span class="${i < LOCK.pin.length ? "on" : ""}"></span>`).join(""); }
+function lockMode(mode) {
+  LOCK.mode = mode; LOCK.pin = ""; lockDots();
+  const setup = mode !== "unlock";
+  $("lock-pad").classList.toggle("hidden", mode === "bio"); $("lock-dots").classList.toggle("hidden", mode === "bio");
+  $("lock-ok").classList.toggle("hidden", mode === "bio"); $("lock-biostep").classList.toggle("hidden", mode !== "bio");
+  $("lock-forgot").classList.toggle("hidden", setup);
+  $("lock-ok").textContent = mode === "setup1" ? "ถัดไป" : mode === "setup2" ? "ยืนยัน PIN" : "เข้าสู่ระบบ";
+  $("lock-bio").style.visibility = mode === "unlock" && LOCK.cfg && LOCK.cfg.cred ? "visible" : "hidden";
+  $("lock-msg").textContent = { setup1: "ตั้ง PIN 4–8 หลัก สำหรับเข้าสู่ระบบ", setup2: "ใส่ PIN อีกครั้งเพื่อยืนยัน", bio: "เปิดใช้สแกนนิ้ว/ใบหน้าเพื่อเข้าสู่ระบบเร็วขึ้นไหม?", unlock: "ใส่ PIN เพื่อเข้าสู่ระบบ" }[mode];
+  lucide.createIcons();
+}
+async function setupStep() {
+  if (LOCK.mode === "setup1") {
+    const p = LOCK.pin;
+    if (!/^\d{4,8}$/.test(p)) { $("lock-msg").textContent = "PIN ต้องเป็นตัวเลข 4–8 หลัก"; return; }
+    if (/^(\d)\1+$/.test(p) || "0123456789".includes(p) || "9876543210".includes(p)) { LOCK.pin = ""; lockDots(); $("lock-msg").textContent = "PIN เดาง่ายเกินไป — ห้ามเลขซ้ำหรือเรียงกัน"; return; }
+    LOCK.first = p; lockMode("setup2"); return;
+  }
+  if (LOCK.mode === "setup2") {
+    if (LOCK.pin !== LOCK.first) { LOCK.first = ""; lockMode("setup1"); $("lock-msg").textContent = "PIN ไม่ตรงกัน — ตั้งใหม่อีกครั้ง"; return; }
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    LOCK.cfg = { salt: b64(salt), hash: await pinHash(LOCK.first, salt), len: LOCK.first.length, auto: 5 }; LOCK.first = "";
+    LS.set(K.lock, LOCK.cfg);
+    if (await bioAvailable()) lockMode("bio"); else { unlock(); toast("ตั้งค่าเข้าสู่ระบบเรียบร้อย ✓"); }
+  }
+}
+$("lock-bio-yes").onclick = async () => { try { LOCK.cfg.cred = await registerBio(); LS.set(K.lock, LOCK.cfg); toast("เปิดใช้สแกนนิ้ว/ใบหน้าแล้ว ✓"); } catch (_) { toast("ตั้งค่าสแกนไม่สำเร็จ — ใช้ PIN แทน"); } unlock(); };
+$("lock-bio-no").onclick = () => { unlock(); toast("ตั้งค่าเข้าสู่ระบบเรียบร้อย ✓"); };
 function showLock() {
-  if (!LOCK.cfg) return; document.documentElement.classList.add("locked"); LOCK.pin = ""; lockDots();
-  $("lock-msg").textContent = "ใส่ PIN เพื่อเข้าสู่ระบบ"; $("lock-bio").style.visibility = LOCK.cfg.cred ? "visible" : "hidden"; lucide.createIcons();
+  document.documentElement.classList.add("locked");
+  if (!LOCK.cfg) return lockMode("setup1");
+  lockMode("unlock");
   if (LOCK.cfg.cred && document.visibilityState === "visible") setTimeout(bioUnlock, 350);
 }
 function unlock() { document.documentElement.classList.remove("locked"); LOCK.pin = ""; LOCK.fails = 0; setTimeout(() => { map.invalidateSize(); FM.map && FM.map.invalidateSize(); }, 50); }
 async function tryPin() {
+  if (LOCK.mode !== "unlock") return setupStep();
   if (!LOCK.cfg || !LOCK.pin) return;
   if (Date.now() < LOCK.until) { $("lock-msg").textContent = `ลองใหม่ใน ${Math.ceil((LOCK.until - Date.now()) / 1000)} วินาที`; return; }
   const ok = await pinHash(LOCK.pin, unb64(LOCK.cfg.salt)) === LOCK.cfg.hash;
@@ -2019,12 +2049,12 @@ async function registerBio() {
 $("lock-pad").addEventListener("click", e => {
   const k = e.target.closest("[data-k]"); if (!k) return; const v = k.dataset.k;
   if (v === "del") LOCK.pin = LOCK.pin.slice(0, -1); else if (LOCK.pin.length < 8) LOCK.pin += v;
-  lockDots(); if (LOCK.cfg && LOCK.pin.length === LOCK.cfg.len) tryPin();
+  lockDots(); if (LOCK.mode === "unlock" && LOCK.cfg && LOCK.pin.length === LOCK.cfg.len) tryPin();
 });
 $("lock-ok").onclick = tryPin; $("lock-bio").onclick = bioUnlock;
 document.addEventListener("keydown", e => {
   if (!isLocked()) return; e.stopImmediatePropagation();
-  if (/^\d$/.test(e.key) && LOCK.pin.length < 8) { LOCK.pin += e.key; lockDots(); if (LOCK.cfg && LOCK.pin.length === LOCK.cfg.len) tryPin(); }
+  if (/^\d$/.test(e.key) && LOCK.pin.length < 8) { LOCK.pin += e.key; lockDots(); if (LOCK.mode === "unlock" && LOCK.cfg && LOCK.pin.length === LOCK.cfg.len) tryPin(); }
   else if (e.key === "Backspace") { LOCK.pin = LOCK.pin.slice(0, -1); lockDots(); } else if (e.key === "Enter") tryPin();
 }, true);
 $("lock-forgot").onclick = async () => {
@@ -2042,7 +2072,7 @@ document.addEventListener("visibilitychange", () => {
 async function renderLockSettings() {
   const on = !!LOCK.cfg;
   $("lock-state").className = `pill ${on ? "pill-go" : "pill-warn"}`; $("lock-state").textContent = on ? "เปิดใช้งาน" : "ยังไม่ตั้งค่า";
-  $("lk-cur-wrap").classList.toggle("hidden", !on); $("btn-lock-now").classList.toggle("hidden", !on); $("btn-lock-off").classList.toggle("hidden", !on);
+  $("lk-cur-wrap").classList.toggle("hidden", !on); $("btn-lock-now").classList.toggle("hidden", !on);
   $("btn-lock-save").textContent = on ? "เปลี่ยน PIN / บันทึกการตั้งค่า" : "ตั้ง PIN และเปิดการล็อก";
   $("lk-auto").value = String(on ? LOCK.cfg.auto || 5 : 5); $("lk-bio").checked = on && !!LOCK.cfg.cred;
   $("lk-bio").disabled = !(await bioAvailable()); if ($("lk-bio").disabled) $("lk-bio").parentElement.title = "อุปกรณ์/เบราว์เซอร์นี้ไม่รองรับ";
@@ -2065,12 +2095,8 @@ $("btn-lock-save").onclick = async () => {
   renderLockSettings(); toast("บันทึกการเข้าสู่ระบบแล้ว ✓ ครั้งต่อไปที่เปิดแอปจะต้องใส่ PIN");
 };
 $("btn-lock-now").onclick = () => { closeAppModal(); showLock(); };
-$("btn-lock-off").onclick = async () => {
-  if (await pinHash($("lk-cur").value.trim(), unb64(LOCK.cfg.salt)) !== LOCK.cfg.hash) return toast("ใส่ PIN ปัจจุบันให้ถูกต้องเพื่อปิดการล็อก");
-  LOCK.cfg = null; try { localStorage.removeItem(K.lock); } catch (_) {} idbSet(K.lock, null); $("lk-cur").value = ""; renderLockSettings(); toast("ปิดการล็อกแอปแล้ว");
-};
 if (!window.crypto || !crypto.subtle) { $("btn-lock-save").disabled = true; $("lock-setup").insertAdjacentHTML("afterbegin", `<p class="text-[12px] text-amber-300">ต้องเปิดแอปผ่าน https จึงจะใช้การล็อกได้</p>`); }
-if (LOCK.cfg) showLock(); else document.documentElement.classList.remove("locked");
+if (window.crypto && crypto.subtle) showLock(); else document.documentElement.classList.remove("locked");
 
 // ---- automatic Series J update: data/notam-j.json is produced by the "Update NOTAM" GitHub Action ----
 async function updateNotamsFromServer(manual) {
